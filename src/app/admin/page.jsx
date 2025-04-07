@@ -1,4 +1,4 @@
-import LoginAdminComponent from "../components/loginadmin";
+import LoginAdminComponent from "../components/loginAdmin";
 // import RegisterAdminComponent from "../components/registerAdmin";
 
 export default function admin({ params }) {
