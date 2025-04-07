@@ -9,8 +9,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {/* <main>{children}</main> */}
-        <div>Hola deploy</div>
+        <main>{children}</main>
         <AddBootstrap />
       </body>
     </html>
