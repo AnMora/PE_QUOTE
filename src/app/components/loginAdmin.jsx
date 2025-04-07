@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function LoginAdminComponent(params) {
   const [state, action, isPending] = useActionState(loginAdmin, undefined)
 
-  console.log(isPending);
+  // console.log(isPending);
 
   return (
     <div id="layoutAuthentication_content">
