@@ -1,5 +1,5 @@
 import LoginAdminComponent from "../components/loginadmin";
-import RegisterAdminComponent from "../components/registerAdmin";
+// import RegisterAdminComponent from "../components/registerAdmin";
 
 export default function admin({ params }) {
   return (
@@ -11,8 +11,8 @@ export default function admin({ params }) {
           Administrador para cotizaciones  de urgencias Pediaclinic, para poder
           ingresar digite sus datos de administrador
         </p>
-      <RegisterAdminComponent />
-      {/* <LoginAdminComponent /> */}
+      {/* <RegisterAdminComponent /> */}
+      <LoginAdminComponent />
     </div>
   );
 }
