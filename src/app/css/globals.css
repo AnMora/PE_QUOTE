@@ -350,6 +350,8 @@ textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 button,
