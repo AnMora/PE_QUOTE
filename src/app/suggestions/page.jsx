@@ -56,7 +56,7 @@ export default async function suggestions(params) {
                 <div className="card-body">
                   <p
                     className="card-text"
-                    style={{ maxHeight: "100px", resize: "none" }}
+                    style={{ maxHeight: "100px", overflow: "hidden", textOverflow: "ellipsis", resize: "none" }}
                   >
                     {item.description}
                   </p>
