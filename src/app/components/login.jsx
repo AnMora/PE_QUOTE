@@ -1,12 +1,18 @@
 "use client"
 
-import { useActionState } from "react";
+import React, { useActionState } from "react";
 import Link from "next/link";
 import { login } from "../actions/auth";
-
+import { useRouter } from 'next/navigation'; // Importa useRouter
 export default function LoginComponent(params) {
-  const [state, action, isPending] = useActionState(login, undefined)
-
+  const [state, action, isPending] = useActionState(login, undefined);
+  const router = useRouter(); // Inicializa useRouter
+  // Efecto para manejar la redirección
+  React.useEffect(() => {
+    if (state?.redirectTo) {
+      router.push(state.redirectTo); // Realiza la redirección
+    }
+  }, [state]);
   return (
     <div id="layoutAuthentication_content">
       <main>
@@ -44,7 +50,6 @@ export default function LoginComponent(params) {
                     </div>
                     <div className="mt-4 mb-0">
                       <div className="d-grid">
-                      {/* <Link > */}
                         <button disabled={isPending} className="btn btn-primary">
                           {isPending ? (
                             <div className="spinner-border spinner-border-sm" role="status">
@@ -52,7 +57,6 @@ export default function LoginComponent(params) {
                             </div>
                           ) : "Login"}
                         </button>
-                      {/* </Link> */}
                       </div>
                     </div>
                   </form>

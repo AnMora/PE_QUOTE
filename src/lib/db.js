@@ -14,13 +14,24 @@ const client = new MongoClient(process.env.DB_URI, {
   },
 });
 
+// async function getDB(dbName) {
+//   try {
+//     await client.connect();
+//     console.log(">>>>Connected to MongoDB<<<<");
+//     return client.db(dbName);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 async function getDB(dbName) {
   try {
     await client.connect();
     console.log(">>>>Connected to MongoDB<<<<");
     return client.db(dbName);
   } catch (error) {
-    console.log(error);
+    console.error("Error connecting to MongoDB:", error);
+    throw new Error("Database connection failed");
   }
 }
 

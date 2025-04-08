@@ -49,9 +49,9 @@ export async function register(state, formData) {
     password: hashedPassword,
     range: "user",
   });
-  
+
   // **CREATE A SESSION
-  await createSession(results.insertedId.toString())
+  await createSession(results.insertedId.toString());
 
   // **REDIRECT
   redirect("/dashboard");
@@ -99,9 +99,9 @@ export async function registerAdmin(state, formData) {
     password: hashedPassword,
     range: "admin",
   });
-  
+
   // **CREATE A SESSION
-  await createSession(results.insertedId.toString())
+  await createSession(results.insertedId.toString());
 
   // **REDIRECT
   redirect("/dashboard");
@@ -123,23 +123,40 @@ export async function login(state, formData) {
     };
   }
 
-  const { email, password } = validatedFields.data
+  const { email, password } = validatedFields.data;
 
-  const userCollection = await getCollection("users")
-  if (!userCollection) return { errors: {email: "Server error!"} }
+  const userCollection = await getCollection("users");
+  if (!userCollection) return { errors: { email: "Server error!" } };
 
-  const existingUser = await userCollection.findOne({email})
-  if (!existingUser) return { errors: {email: "Invalid Credentials!"} }
+  // const existingUser = await userCollection.findOne({ email });
+  // if (!existingUser) return { errors: { email: "Invalid Credentials!" } };
 
-  const matchedPassword = await bcrypt.compare(password, existingUser.password)
-  if (!matchedPassword) return { errors: {email: "Invalid Credentials!"} }
+  // const matchedPassword = await bcrypt.compare(password, existingUser.password);
+  // if (!matchedPassword) return { errors: { email: "Invalid Credentials!" } };
 
-  await createSession(existingUser._id.toString())
+  // await createSession(existingUser._id.toString());
 
-  console.log(existingUser);
+  // console.log(existingUser);
 
-  redirect(`/dashboard/${existingUser._id.toString()}`)
+  // redirect(`/dashboard/${existingUser._id.toString()}`);
 
+  try {
+    const existingUser = await userCollection.findOne({ email });
+    if (!existingUser) {
+      return { errors: { email: "Invalid Credentials!" } };
+    }
+    const matchedPassword = await bcrypt.compare(password, existingUser.password);
+    if (!matchedPassword) {
+      return { errors: { password: "Invalid password!" } }; 
+    }
+    await createSession(existingUser._id.toString());
+    console.log(existingUser);
+    // redirect(`/dashboard/${existingUser._id.toString()}`);
+    return { redirectTo: `/dashboard/${existingUser._id.toString()}` };
+  } catch (error) {
+    console.error("Error during login process:", error);
+    return { errors: { email: "An error occurred. Please try again later." } };
+  }
 }
 
 export async function loginAdmin(state, formData) {
@@ -164,7 +181,7 @@ export async function loginAdmin(state, formData) {
 }
 
 export async function logout(params) {
-  const cookieStore = await cookies()
-  cookieStore.delete("session")
-  redirect("/")
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+  redirect("/");
 }
