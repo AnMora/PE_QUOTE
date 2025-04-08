@@ -55,8 +55,8 @@ export default async function suggestions(params) {
                 </div>
                 <div className="card-body">
                   <p
-                    className="card-text"
-                    style={{ maxHeight: "100px", overflow: "hidden", resize: "none" }}
+                    className="card-text textarea-hidden-scroll"
+                    style={{ maxHeight: "100px", overflow: "scroll", resize: "none" }}
                   >
                     {item.description}
                   </p>
