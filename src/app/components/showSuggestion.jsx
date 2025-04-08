@@ -1,6 +1,6 @@
 export default function ShowSuggestion({ suggestion }) {
   return (
-    <div>
+    <div className="container px-2">
       <div
         className="card mb-3"
         // style={{ Height: "400px", minHeight: "300px" }}

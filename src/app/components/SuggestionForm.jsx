@@ -7,13 +7,11 @@ export default function SuggestionFormComponent({ handler }) {
   return (
     <div id="layoutAuthentication_content">
       <main>
-        <div className="container-fluid px-2">
-          <div className="row justify-content-center">
-            <div className="col-lg-5">
+        <div className="container px-2">
               <div className="card shadow-lg border-0 rounded-lg mt-2 mb-2">
                 <div className="card-header">
                   <h3 className="text-center font-weight-light my-2">
-                    Sugerencias
+                    Crear sugerencia o comentario
                   </h3>
                 </div>
                 <div className="card-body">
@@ -27,7 +25,7 @@ export default function SuggestionFormComponent({ handler }) {
                         placeholder="Sugerencias"
                         defaultValue={state?.title}
                       />
-                      <label htmlFor="title">Sugerencia</label>
+                      <label htmlFor="title">Sugerencia o comentario</label>
                       {state?.errors?.title && (
                         <p className="error">{state.errors.title}</p>
                       )}
@@ -40,33 +38,39 @@ export default function SuggestionFormComponent({ handler }) {
                         type="text"
                         name="description"
                         placeholder="Descripcion"
-                        style={{height: "200px"}}
+                        style={{ height: "200px" }}
                         defaultValue={state?.description}
                       ></textarea>
-                      <label htmlFor="description">Descripcion</label>
+                      <label htmlFor="description">Descripción</label>
                       {state?.errors?.description && (
                         <p className="error">{state.errors.description}</p>
                       )}
                     </div>
                     <div className="mt-4 mb-0">
                       <div className="d-grid">
-                      {/* <Link > */}
-                        <button disabled={isPending} className="btn btn-primary">
+                        <button
+                          disabled={isPending}
+                          className="btn btn-primary"
+                        >
                           {isPending ? (
-                            <div className="spinner-border spinner-border-sm" role="status">
-                              <span className="visually-hidden">Loading...</span>
+                            <div
+                              className="spinner-border spinner-border-sm"
+                              role="status"
+                            >
+                              <span className="visually-hidden">
+                                Loading...
+                              </span>
                             </div>
-                          ) : "Submit"}
+                          ) : (
+                            "Submit"
+                          )}
                         </button>
-                      {/* </Link> */}
                       </div>
                     </div>
                   </form>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
       </main>
     </div>
   );

@@ -56,8 +56,7 @@ export default function NavComponent({ dataUser }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {/* <i className="fas fa-user fa-fw"></i> */}
-              H
+              {/* <i className="fas fa-user fa-fw"></i> */}H
             </Link>
             <ul
               className="dropdown-menu dropdown-menu-end"

@@ -32,8 +32,8 @@ const CUPPanelUser = {
     },
   ],
   generalInformation: {
-    websiteName: "Cotizador UP",
-    description: "Cotizador de urgencias pediatricas",
+    websiteName: "Cotizador PE",
+    description: "Cotizador de pediatria - emergencias",
     medicalCenter: "Hospital Metropolitano",
   },
 };

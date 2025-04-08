@@ -128,18 +128,6 @@ export async function login(state, formData) {
   const userCollection = await getCollection("users");
   if (!userCollection) return { errors: { email: "Server error!" } };
 
-  // const existingUser = await userCollection.findOne({ email });
-  // if (!existingUser) return { errors: { email: "Invalid Credentials!" } };
-
-  // const matchedPassword = await bcrypt.compare(password, existingUser.password);
-  // if (!matchedPassword) return { errors: { email: "Invalid Credentials!" } };
-
-  // await createSession(existingUser._id.toString());
-
-  // console.log(existingUser);
-
-  // redirect(`/dashboard/${existingUser._id.toString()}`);
-
   try {
     const existingUser = await userCollection.findOne({ email });
     if (!existingUser) {
