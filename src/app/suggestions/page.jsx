@@ -48,7 +48,7 @@ export default async function suggestions(params) {
                     </div>
                     <div className="flex-shrink-1 p-1 bd-highlight">
                       <p className="small">
-                        {item._id.getTimestamp().toLocaleString()} por Angel Mora
+                        {item._id.getTimestamp().toLocaleDateString()} por Angel Mora
                       </p>
                     </div>
                   </div>
@@ -56,7 +56,7 @@ export default async function suggestions(params) {
                 <div className="card-body">
                   <p
                     className="card-text"
-                    style={{ maxHeight: "100px", overflow: "scroll" }}
+                    style={{ maxHeight: "100px", overflow: "hidden", resize: "none" }}
                   >
                     {item.description}
                   </p>
