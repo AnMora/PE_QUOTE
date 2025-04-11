@@ -1,4 +1,10 @@
 export default function DashboardUser({ params }) {
+
+  
+  const parametros = params;
+  console.log(parametros);
+  
+
   return (
     <>
       <h1 className="mt-4">Dashboard Usuario</h1>

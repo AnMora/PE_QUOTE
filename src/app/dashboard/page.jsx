@@ -1,6 +1,5 @@
-import FooterComponent from "../components/footer";
+export default async function Dashboard({params}) {
 
-export default async function Dashboard(params) {
   return (
     <>
       <h1 className="mt-4">Dashboard Principal</h1>
