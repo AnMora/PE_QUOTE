@@ -50,5 +50,53 @@ export async function createPost(state, formData) {
     };
   }
 
+  // ** REDIRECT
+  redirect("/suggestions");
+}
+
+export async function editPost(state, formData) {
+  // ** CHECK IF USER IS SIGNED IN
+  const user = await getAuthUser();
+  if (!user) return redirect("/");
+
+  // console.log(formData.get("suggestionId"));
+
+  // ** VALIDATE FORM FIELDS
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const suggestionid = formData.get("suggestionId")
+
+  const validateFields = SuggestionFormSchema.safeParse({
+    title,
+    description,
+  });
+
+  // ** IF ANY FORM FIELDS ARE INVALID
+  if (!validateFields.success) {
+    return {
+      errors: validateFields.error.flatten().fieldErrors,
+      title,
+      description,
+    };
+  }
+
+  // ** FIND THE POST THAT WE WANT UPDATE
+  const suggestionCollection = await getCollection("suggestions")
+  const suggestion = await suggestionCollection.findOne({
+    _id: ObjectId.createFromHexString(suggestionid)
+  })
+
+  // ** CHECK THE USER OWNS THE POST
+  if (user.userId !== suggestion.userId.toString()) redirect("/suggestions")
+
+  // ** UPDATE THE POST IN DB
+  suggestionCollection.findOneAndUpdate({_id: suggestion._id}, {
+    $set: {
+      title: validateFields.data.title,
+      description: validateFields.data.description
+    }
+  })
+  
+  // ** REDIRECT
   redirect("/suggestions");
 }

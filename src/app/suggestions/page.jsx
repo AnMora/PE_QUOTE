@@ -48,7 +48,8 @@ export default async function suggestions(params) {
                     </div>
                     <div className="flex-shrink-1 p-1 bd-highlight">
                       <p className="small">
-                        {item._id.getTimestamp().toLocaleDateString()} por Angel Mora
+                        {item._id.getTimestamp().toLocaleDateString()} por Angel
+                        Mora
                       </p>
                     </div>
                   </div>
@@ -56,17 +57,22 @@ export default async function suggestions(params) {
                 <div className="card-body">
                   <p
                     className="card-text"
-                    style={{ maxHeight: "100px", overflow: "hidden", textOverflow: "ellipsis", resize: "none" }}
+                    style={{
+                      maxHeight: "100px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      resize: "none",
+                    }}
                   >
                     {item.description}
                   </p>
                 </div>
                 <div className="card-footer d-flex align-items-center justify-content-between">
-                <Link href={`/suggestions/show/${item._id.toString()}`}>
-                  <button className="btn btn-info" href="#">
-                    Ver sugerencia
-                  </button>
-                </Link>
+                  <Link href={`/suggestions/show/${item._id.toString()}`}>
+                    <button className="btn btn-info" href="#">
+                      Ver sugerencia
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
