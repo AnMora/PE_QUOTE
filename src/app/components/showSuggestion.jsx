@@ -3,7 +3,6 @@ import Link from "next/link";
 
 export default async function ShowSuggestion({ suggestion }) {
   const user = await getAuthUser();
-
   // console.log(user.userId === suggestion.userId.toString());
   
   return (
@@ -18,8 +17,7 @@ export default async function ShowSuggestion({ suggestion }) {
                 </div>
                 <div className="flex-shrink-1 p-1 bd-highlight">
                   <p className="small">
-                    {suggestion._id.getTimestamp().toLocaleString()} por Angel
-                    Mora
+                    {suggestion._id.getTimestamp().toLocaleString()} por {suggestion.userName} {suggestion.userLastName}
                   </p>
                 </div>
               </div>

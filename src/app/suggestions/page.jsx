@@ -48,8 +48,7 @@ export default async function suggestions(params) {
                     </div>
                     <div className="flex-shrink-1 p-1 bd-highlight">
                       <p className="small">
-                        {item._id.getTimestamp().toLocaleDateString()} por Angel
-                        Mora
+                        {item._id.getTimestamp().toLocaleDateString()} por {item.userName} {item.userLastName}
                       </p>
                     </div>
                   </div>

@@ -12,7 +12,6 @@ export default async function showSuggestion({ params }) {
           _id: ObjectId.createFromHexString(id),
         })
       : null;
-      
 
   return (
     <>

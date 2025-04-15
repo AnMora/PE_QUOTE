@@ -5,14 +5,12 @@ import getAuthUser from "@/lib/getAuthUser";
 import { SuggestionFormSchema } from "@/lib/rules";
 import { errors } from "jose";
 import { ObjectId } from "mongodb";
+import { requestToBodyStream } from "next/dist/server/body-streams";
 import { redirect } from "next/navigation";
 
 export async function createPost(state, formData) {
   // ** CHECK IF USER IS SIGNED IN
   const user = await getAuthUser();
-  //   console.log(user);
-  //   return;
-
   if (!user) return redirect("/");
 
   // ** VALIDATE FORM FIELDS
@@ -33,6 +31,16 @@ export async function createPost(state, formData) {
     };
   }
 
+  // ** CHECK IF USER EXISTS IN THE DATABASE
+  const userCollection = await getCollection("users");
+  if (!userCollection) return { errors: { email: "Server error!" } };
+
+  // ** FIND USER IN DATABASE
+  const dbUser = await userCollection.findOne({
+    _id: ObjectId.createFromHexString(user.userId),
+  });
+  if (!dbUser) return { errors: { user: "User not found!" } };
+
   // ** SAVE THE NEW POST IN DB
   try {
     const suggestionCollection = await getCollection("suggestions");
@@ -40,6 +48,9 @@ export async function createPost(state, formData) {
       title: validateFields.data.title,
       description: validateFields.data.description,
       userId: ObjectId.createFromHexString(user.userId),
+      userId: dbUser._id,
+      userName: dbUser.firstName,
+      userLastName: dbUser.lastName,
     };
     await suggestionCollection.insertOne(suggestion);
   } catch (error) {
@@ -64,7 +75,7 @@ export async function editPost(state, formData) {
   // ** VALIDATE FORM FIELDS
   const title = formData.get("title");
   const description = formData.get("description");
-  const suggestionid = formData.get("suggestionId")
+  const suggestionid = formData.get("suggestionId");
 
   const validateFields = SuggestionFormSchema.safeParse({
     title,
@@ -81,22 +92,25 @@ export async function editPost(state, formData) {
   }
 
   // ** FIND THE POST THAT WE WANT UPDATE
-  const suggestionCollection = await getCollection("suggestions")
+  const suggestionCollection = await getCollection("suggestions");
   const suggestion = await suggestionCollection.findOne({
-    _id: ObjectId.createFromHexString(suggestionid)
-  })
+    _id: ObjectId.createFromHexString(suggestionid),
+  });
 
   // ** CHECK THE USER OWNS THE POST
-  if (user.userId !== suggestion.userId.toString()) redirect("/suggestions")
+  if (user.userId !== suggestion.userId.toString()) redirect("/suggestions");
 
   // ** UPDATE THE POST IN DB
-  suggestionCollection.findOneAndUpdate({_id: suggestion._id}, {
-    $set: {
-      title: validateFields.data.title,
-      description: validateFields.data.description
+  suggestionCollection.findOneAndUpdate(
+    { _id: suggestion._id },
+    {
+      $set: {
+        title: validateFields.data.title,
+        description: validateFields.data.description,
+      },
     }
-  })
-  
+  );
+
   // ** REDIRECT
   redirect("/suggestions");
 }

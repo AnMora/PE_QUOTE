@@ -111,11 +111,13 @@ export async function registerAdmin(state, formData) {
 // !!INSERTAR LOS DEMAS DATOS PARA QUE SE COMPLETE CORRECTAMENTE
 
 export async function login(state, formData) {
+  // ** CHECK THE INPUTS FORM FIELDS
   const validatedFields = LoginFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
+  // ** VALIDATE FORM FIELDS
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
@@ -139,7 +141,6 @@ export async function login(state, formData) {
     }
     await createSession(existingUser._id.toString());
     console.log(existingUser);
-    // redirect(`/dashboard/${existingUser._id.toString()}`);
     return { redirectTo: `/dashboard/${existingUser._id.toString()}` };
   } catch (error) {
     console.error("Error during login process:", error);
