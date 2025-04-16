@@ -47,9 +47,8 @@ export async function createPost(state, formData) {
     const suggestion = {
       title: validateFields.data.title,
       description: validateFields.data.description,
-      userId: ObjectId.createFromHexString(user.userId),
       userId: dbUser._id,
-      userName: dbUser.firstName,
+      userFirstName: dbUser.firstName,
       userLastName: dbUser.lastName,
     };
     await suggestionCollection.insertOne(suggestion);
@@ -75,7 +74,7 @@ export async function editPost(state, formData) {
   // ** VALIDATE FORM FIELDS
   const title = formData.get("title");
   const description = formData.get("description");
-  const suggestionid = formData.get("suggestionId");
+  const suggestionId = formData.get("suggestionId");
 
   const validateFields = SuggestionFormSchema.safeParse({
     title,
@@ -94,10 +93,10 @@ export async function editPost(state, formData) {
   // ** FIND THE POST THAT WE WANT UPDATE
   const suggestionCollection = await getCollection("suggestions");
   const suggestion = await suggestionCollection.findOne({
-    _id: ObjectId.createFromHexString(suggestionid),
+    _id: ObjectId.createFromHexString(suggestionId),
   });
 
-  // ** CHECK THE USER OWNS THE POST
+  // ** CHECK THE AUTH USER OWNS THE POST
   if (user.userId !== suggestion.userId.toString()) redirect("/suggestions");
 
   // ** UPDATE THE POST IN DB
@@ -110,6 +109,30 @@ export async function editPost(state, formData) {
       },
     }
   );
+
+  // ** REDIRECT
+  redirect("/suggestions");
+}
+
+export async function deletePost(formData) {
+  // ** CHECK IF USER IS SIGNED IN
+  const user = await getAuthUser();
+  if (!user) return redirect("/");
+
+  // ** GET THE ID FORM FIELD
+  const suggestionId = formData.get("suggestionId");
+
+  // ** FIND THE POST
+  const suggestionCollection = await getCollection("suggestions");
+  const suggestion = await suggestionCollection.findOne({
+    _id: ObjectId.createFromHexString(suggestionId),
+  });
+
+  // ** CHECK THE AUTH USER OWNS THE POST
+  if (user.userId !== suggestion.userId.toString()) redirect("/suggestions");
+
+  // ** DELETE THE POST
+  suggestionCollection.findOneAndDelete({ _id: suggestion._id })
 
   // ** REDIRECT
   redirect("/suggestions");

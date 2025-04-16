@@ -107,9 +107,6 @@ export async function registerAdmin(state, formData) {
   redirect("/dashboard");
 }
 
-// !!PONER EN LA BASE DATOS EL RANGO DIFERENCIAL  => RANGO: admin || user
-// !!INSERTAR LOS DEMAS DATOS PARA QUE SE COMPLETE CORRECTAMENTE
-
 export async function login(state, formData) {
   // ** CHECK THE INPUTS FORM FIELDS
   const validatedFields = LoginFormSchema.safeParse({
@@ -135,12 +132,15 @@ export async function login(state, formData) {
     if (!existingUser) {
       return { errors: { email: "Invalid Credentials!" } };
     }
-    const matchedPassword = await bcrypt.compare(password, existingUser.password);
+    const matchedPassword = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
     if (!matchedPassword) {
-      return { errors: { password: "Invalid password!" } }; 
+      return { errors: { password: "Invalid password!" } };
     }
     await createSession(existingUser._id.toString());
-    console.log(existingUser);
+    // console.log(existingUser);
     return { redirectTo: `/dashboard/${existingUser._id.toString()}` };
   } catch (error) {
     console.error("Error during login process:", error);
