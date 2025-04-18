@@ -1,24 +1,47 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { logout } from "../actions/auth";
 
 export default function NavComponent({ dataUser }) {
   const data = dataUser;
-  const patname = usePathname();
+  const pathname = usePathname();
+  useEffect(() => {
+    const sidebarButton = document.body.querySelector("#sidebarToggle");
+    const handleSidebarToggle = (event) => {
+      event.preventDefault();
+      document.body.classList.toggle("sb-sidenav-toggled");
+      localStorage.setItem(
+        "sb|sidebar-toggle",
+        document.body.classList.contains("sb-sidenav-toggled")
+      );
+    };
 
+    if (sidebarButton) {
+      sidebarButton.addEventListener("click", handleSidebarToggle);
+    }
+
+    return () => {
+      if (sidebarButton) {
+        sidebarButton.removeEventListener("click", handleSidebarToggle);
+      }
+    };
+  }, []);
+  useEffect(() => {
+    document.body.classList.remove("sb-sidenav-toggled");
+    localStorage.removeItem("sb|sidebar-toggle");
+  }, [pathname]);
+
+  // **AVERIGUAR CON PROYECTO PORTAFOLIO COMO CAMBIAR LOS ICONOS AL MOMENTO DE MAPEAR
   return (
     <>
-      {/* <Link
-        className={`nav-link ${patname === href ? "nav-link active" : ""}`}
-        href={href ? href : "" }
+      <nav
+        id="mainNav"
+        className="sb-topnav navbar navbar-expand navbar-dark bg-dark"
       >
-        {label}
-      </Link> */}
-
-      <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <Link className="navbar-brand ps-3" href="#">
+        <Link className="navbar-brand ps-3" href="#!">
           {data.generalInformation.websiteName}
         </Link>
         <button
@@ -26,7 +49,7 @@ export default function NavComponent({ dataUser }) {
           id="sidebarToggle"
           href="#!"
         >
-          Menu
+          <i className="fas fa-bars"></i>
         </button>
         <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
           <div className="input-group">
@@ -56,7 +79,7 @@ export default function NavComponent({ dataUser }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {/* <i className="fas fa-user fa-fw"></i> */}H
+              <i className="fas fa-user fa-fw"></i>
             </Link>
             <ul
               className="dropdown-menu dropdown-menu-end"
@@ -67,9 +90,12 @@ export default function NavComponent({ dataUser }) {
                   Configuracion
                 </Link>
               </li>
+              <li>
+                <hr className="dropdown-divider" />
+              </li>
               <form action={logout}>
                 <li>
-                  <button className="dropdown-item">Cerrar Session</button>
+                  <button className="dropdown-item">Cerrar Sesión</button>
                 </li>
               </form>
             </ul>
