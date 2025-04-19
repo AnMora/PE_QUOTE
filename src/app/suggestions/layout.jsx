@@ -27,7 +27,7 @@ export default async function SuggestionsLayout({ children }) {
                 <div>{children}</div>
               </div>
             </main>
-            <FooterComponent />
+            <FooterComponent dataUser={dataUser} />
           </div>
         </div>
       </div>

@@ -9,9 +9,9 @@ export default function FooterComponent(params) {
               by AnMora
             </div>
             <div>
-              <a href="#">Privacy Policy </a>
+              <a href="#">Politicas de privacidad </a>
               &middot;
-              <a href="#"> Terms &amp; Conditions</a>
+              <a href="#"> Terminos &amp; Condiciones</a>
             </div>
           </div>
         </div>

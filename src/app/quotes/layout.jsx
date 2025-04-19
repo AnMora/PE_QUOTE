@@ -7,7 +7,7 @@ import NavLinkComponent from "../components/navLink";
 import Link from "next/link";
 import ErrNoAuth from "../components/401Error";
 
-export default async function DashboardLayout({ children }) {
+export default async function QuotesLayout({ children }) {
 
   const authUser = await getAuthUser();
 

@@ -12,7 +12,7 @@ export default function NavLinkComponent({ dataUser }) {
         <div key={position}>
           <Link className="nav-link" href={item.path}>
             <div className="sb-nav-link-icon">
-              <i className="fas fa-tachometer-alt"></i>
+              <i className={item.icon}></i>
             </div>
             {item.session}
           </Link>
@@ -25,7 +25,7 @@ export default function NavLinkComponent({ dataUser }) {
         <div key={position}>
           <Link className="nav-link" href={item.path}>
             <div className="sb-nav-link-icon">
-              <i className="fas fa-tachometer-alt"></i>
+              <i className={item.icon}></i>
             </div>
             {item.session}
           </Link>
@@ -38,7 +38,7 @@ export default function NavLinkComponent({ dataUser }) {
         <div key={position}>
           <Link className="nav-link" href={item.path}>
             <div className="sb-nav-link-icon">
-              <i className="fas fa-tachometer-alt"></i>
+              <i className={item.icon}></i>
             </div>
             {item.session}
           </Link>

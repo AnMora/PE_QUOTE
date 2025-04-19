@@ -1,34 +1,33 @@
 const CUPPanelUser = {
-  areIn: "Panel Principal",
   pageDashboard: [
     {
-      areIn: "Panel Principal",
       path: "/dashboard",
       session: "Dashboard",
+      icon: "fas fa-tachometer-alt"
     },
   ],
   pageInterface: [
     {
-      areIn: "Interface",
-      path: "/quotation",
+      path: "/quotes",
       session: "Cotizador",
+      icon: "fas fa-chart-area"
     },
     {
-      areIn: "Interface",
       path: "/suggestions",
       session: "Sugerencias",
+      icon: "fas fa-book-open"
     },
   ],
   pageAddons: [
     {
-      areIn: "Complementos",
       path: "/proformas",
       session: "Proformas",
+      icon: "fas fa-columns"
     },
     {
-      areIn: "Complementos",
       path: "/convenios",
       session: "Convenios",
+      icon: "fas fa-table"
     },
   ],
   generalInformation: {
