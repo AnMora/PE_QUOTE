@@ -10,14 +10,13 @@ export default function RegisterComponent(params) {
   return (
     <div id="layoutAuthentication_content">
       <main>
-        <div className="container">
+        <div className="container px-2">
           <div className="row justify-content-center">
-            <div className="col-lg-7">
-              <div className="card shadow-lg border-0 rounded-lg mt-2 mb-2">
+            <div className="col-lg-8">
+              <div className="card bg-dark mt-2 mb-2">
                 <div className="card-header">
-                  <h3 className="text-center font-weight-light my-2">
-                    Create Account
-                  </h3>
+                  <i className="fas fa-user fa-fw me-1"></i>
+                  Usuario Hospital Metropolitano
                 </div>
                 <div className="card-body">
                   <form action={action}>
@@ -32,11 +31,11 @@ export default function RegisterComponent(params) {
                             placeholder="Enter your first name"
                             defaultValue={state?.firstName}
                           />
-                          <label htmlFor="inputFirstName">First name</label>
+                          <label htmlFor="inputFirstName">Nombre</label>
                           {state?.errors?.firstName && (
                             <small
                               id="emailHelp"
-                              className="form-text text-white"
+                              className="form-text text-warning"
                             >
                               {state.errors.firstName}
                             </small>
@@ -53,11 +52,11 @@ export default function RegisterComponent(params) {
                             placeholder="Enter your last name"
                             defaultValue={state?.lastName}
                           />
-                          <label htmlFor="inputLastName">Last name</label>
+                          <label htmlFor="inputLastName">Apellidos</label>
                           {state?.errors?.lastName && (
                             <small
                               id="emailHelp"
-                              className="form-text text-white"
+                              className="form-text text-warning"
                             >
                               {state.errors.lastName}
                             </small>
@@ -74,9 +73,9 @@ export default function RegisterComponent(params) {
                         placeholder="name@example.com"
                         defaultValue={state?.email}
                       />
-                      <label htmlFor="inputEmail">Email address</label>
+                      <label htmlFor="inputEmail">Correo Electrónico</label>
                       {state?.errors?.email && (
-                        <small id="emailHelp" className="form-text text-white">
+                        <small id="emailHelp" className="form-text text-warning">
                           {state.errors.email}
                         </small>
                       )}
@@ -91,14 +90,14 @@ export default function RegisterComponent(params) {
                             name="password"
                             placeholder="Create a password"
                           />
-                          <label htmlFor="inputPassword">Password</label>
+                          <label htmlFor="inputPassword">Contraseña</label>
                           {state?.errors?.password && (
                             <small
                               id="emailHelp"
-                              className="form-text text-white"
+                              className="form-text text-warning"
                             >
-                              <p className="text-white">Password must:</p>
-                              <ul className="small text-white">
+                              <p className="text-warning">Password must:</p>
+                              <ul className="small text-warning">
                                 {state.errors.password.map((err) => (
                                   <li key={err}>{err}</li>
                                 ))}
@@ -117,12 +116,12 @@ export default function RegisterComponent(params) {
                             placeholder="Confirm password"
                           />
                           <label htmlFor="inputPasswordConfirm">
-                            Confirm Password
+                            Confirmar Contraseña
                           </label>
                           {state?.errors?.confirmPassword && (
                             <small
                               id="emailHelp"
-                              className="form-text text-white"
+                              className="form-text text-warning"
                             >
                               {state.errors.confirmPassword}
                             </small>
@@ -134,7 +133,7 @@ export default function RegisterComponent(params) {
                       <div className="d-grid">
                         <button
                           disabled={isPending}
-                          className="btn btn-primary btn-block"
+                          className="btn btn-outline-primary btn-block"
                           href="login.html"
                         >
                           {isPending ? (

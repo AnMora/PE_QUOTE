@@ -2,7 +2,6 @@ import { jsPDF } from "jspdf";
 import { useState } from "react";
 
 export default function QuoteView({ params, suggestion }) {
-
   const [usuario, setUsuario] = useState("");
   const [paciente, setPaciente] = useState("");
   const [seleccionados, setSeleccionados] = useState([]);
@@ -40,7 +39,7 @@ export default function QuoteView({ params, suggestion }) {
   const insumosFiltrados = insumos.filter((insumo) =>
     insumo.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase())
   );
-  
+
   const indexOfLastInsumo = paginaActual * insumosPorPagina;
   const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
   const insumosActuales = insumosFiltrados.slice(
@@ -56,22 +55,21 @@ export default function QuoteView({ params, suggestion }) {
     let y = 40; // Posición vertical inicial
     seleccionados.forEach((insumo) => {
       doc.text(`${insumo.nombre} - $${insumo.precio}`, 10, y);
-      y += 10; 
+      y += 10;
     });
     doc.save("cotizacion.pdf");
   };
   return (
     <form action="">
       {/* DATOS DE PACIENTE  */}
-      <div className="card shadow-lg border-0 rounded-lg mt-2 mb-2">
+        <div className="card bg-dark mb-2">
         <div className="card-header">
-          <h3 className="text-center font-weight-light my-2">
-            Datos de Paciente
-          </h3>
+          <i className="fas fa-user fa-fw me-1"></i>
+          Datos de paciente
         </div>
         <div className="card-body">
           <input type="hidden" name="suggestionId" />
-          <div className="row mb-3">
+          <div className="row mb-2">
             <div className="col-md-6">
               <div className="form-floating mb-3 mb-md-0">
                 <input
@@ -127,107 +125,33 @@ export default function QuoteView({ params, suggestion }) {
         </div>
       </div>
 
-      {/* TABLA DE INSUMOS */}
-      <h2 className="mt-4">Insumos Disponibles</h2>
-      <p>Seleccione los insumos que va a necesitar:</p>
-
-      {/* CAMPO DE BÚSQUEDA */}
-      <div className="mb-1">
-        <div className="form-floating">
-          <input
-            type="text"
-            className="form-control"
-            id="buscador"
-            placeholder="Buscar insumos..."
-            value={terminoBusqueda}
-            onChange={(e) => setTerminoBusqueda(e.target.value)}
-          />
-          <label htmlFor="buscador">Buscar Insumos</label>
+      <div className="card bg-dark mb-2">
+        <div className="card-header">
+          <i className="fas fa-columns me-1"></i>
+          Insumos disponibles
         </div>
-      </div>
-
-      <table className="table table-hover">
-        <thead>
-          <tr className="table-dark">
-            <th scope="col">Nombre</th>
-            <th scope="col">Precio</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {insumosActuales.map((insumo) => (
-            <tr className="table-secondary" key={insumo.id}>
-              <td>{insumo.nombre}</td>
-              <td>${insumo.precio}</td>
-              <td>
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={() => agregarInsumo(insumo)}
-                >
-                  Agregar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Paginación */}
-      <div>
-        <ul className="pagination">
-          <li className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}>
-            <button
-              type="button"
-              className="page-link"
-              onClick={() =>
-                setPaginaActual(paginaActual > 1 ? paginaActual - 1 : 1)
-              }
-              disabled={paginaActual === 1}
-            >
-              &laquo;
-            </button>
-          </li>
-          {Array.from({ length: totalPaginas }, (_, index) => (
-            <li
-              key={index + 1}
-              className={`page-item ${
-                paginaActual === index + 1 ? "primary" : ""
-              }`}
-            >
+        <div className="card-body">
+          {/* CAMPO DE BÚSQUEDA */}
+          <div className="mb-1">
+          <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                id="buscador"
+                placeholder="Buscar insumos..."
+                value={terminoBusqueda}
+                onChange={(e) => setTerminoBusqueda(e.target.value)}
+              />
               <button
+                className="btn btn-primary"
+                id="btnNavbarSearch"
                 type="button"
-                className="page-link"
-                onClick={() => setPaginaActual(index + 1)}
-              >
-                {index + 1}
-              </button>
-            </li>
-          ))}
-          <li
-            className={`page-item ${
-              paginaActual === totalPaginas ? "disabled" : ""
-            }`}
-          >
-            <button
-              type="button"
-              className="page-link"
-              onClick={() =>
-                setPaginaActual(
-                  paginaActual < totalPaginas ? paginaActual + 1 : totalPaginas
-                )
-              }
-              disabled={paginaActual === totalPaginas}
-            >
-              &raquo;
-            </button>
-          </li>
-        </ul>
-      </div>
-      <h2 className="mt-4">Insumos Seleccionados</h2>
-      {seleccionados.length > 0 ? (
-        <div>
-          <table className="table table-hover">
+              ><i className="fas fa-search"></i></button>
+              {/* <label htmlFor="buscador">Buscar Insumos</label> */}
+            </div>
+          </div>
+
+          <table className="table table-hover table-bordered">
             <thead>
               <tr className="table-dark">
                 <th scope="col">Nombre</th>
@@ -235,39 +159,150 @@ export default function QuoteView({ params, suggestion }) {
                 <th scope="col">Acciones</th>
               </tr>
             </thead>
+            <tfoot>
+              <tr className="table-dark">
+                <th scope="col">Nombre</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </tfoot>
             <tbody>
-              {seleccionados.map((insumo, index) => (
-                <tr className="table-secondary" key={index}>
+              {insumosActuales.map((insumo) => (
+                <tr className="table-dark" key={insumo.id}>
                   <td>{insumo.nombre}</td>
                   <td>${insumo.precio}</td>
                   <td>
                     <button
                       type="button"
-                      className="btn btn-danger"
-                      onClick={() => {
-                        setSeleccionados(
-                          seleccionados.filter((_, i) => i !== index)
-                        );
-                      }}
+                      className="btn btn-outline-success"
+                      onClick={() => agregarInsumo(insumo)}
                     >
-                      Eliminar
+                      Agregar
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button
-            className="btn btn-primary mt-4 mb-4"
-            onClick={generarPDF}
-            disabled={seleccionados.length === 0}
-          >
-            Generar PDF
-          </button>
+
+          {/* Paginación */}
+          <div>
+            <ul className="pagination">
+              <li
+                className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="page-link"
+                  onClick={() =>
+                    setPaginaActual(paginaActual > 1 ? paginaActual - 1 : 1)
+                  }
+                  disabled={paginaActual === 1}
+                >
+                  &laquo;
+                </button>
+              </li>
+              {Array.from({ length: totalPaginas }, (_, index) => (
+                <li
+                  key={index + 1}
+                  className={`page-item ${
+                    paginaActual === index + 1 ? "primary" : ""
+                  }`}
+                >
+                  <button
+                    type="button"
+                    className="page-link"
+                    onClick={() => setPaginaActual(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+              <li
+                className={`page-item ${
+                  paginaActual === totalPaginas ? "disabled" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  className="page-link"
+                  onClick={() =>
+                    setPaginaActual(
+                      paginaActual < totalPaginas
+                        ? paginaActual + 1
+                        : totalPaginas
+                    )
+                  }
+                  disabled={paginaActual === totalPaginas}
+                >
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </div>
+          </div>
+          </div>
+
+          <div className="card bg-dark mb-2">
+        <div className="card-header">
+          <i className="fas fa-columns me-1"></i>
+          Insumos seleccionados
         </div>
-      ) : (
-        <p>No se han seleccionado insumos.</p>
-      )}
+        <div className="card-body">
+          {seleccionados.length > 0 ? (
+            <div>
+              <table className="table table-hover table-bordered">
+                <thead>
+                  <tr className="table-dark">
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </thead>
+                <tfoot>
+              <tr className="table-dark">
+                <th scope="col">Nombre</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </tfoot>
+                <tbody>
+                  {seleccionados.map((insumo, index) => (
+                    <tr className="table-dark" key={index}>
+                      <td>{insumo.nombre}</td>
+                      <td>${insumo.precio}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger"
+                          onClick={() => {
+                            setSeleccionados(
+                              seleccionados.filter((_, i) => i !== index)
+                            );
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="d-grid">
+                <button
+                  className="btn btn-outline-primary mt-2 mb-2"
+                  onClick={generarPDF}
+                  disabled={seleccionados.length === 0}
+                >
+                  Generar PDF
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p>No se han seleccionado insumos.</p>
+          )}
+        </div>
+        </div>
     </form>
   );
 }

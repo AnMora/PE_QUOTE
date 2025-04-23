@@ -24,7 +24,7 @@ export default function SuggestionFormComponent({ handler, suggestion }) {
           />
           <label htmlFor="title">Sugerencia o comentario</label>
           {state?.errors?.title && (
-            <p className="error">{state.errors.title}</p>
+            <small className="form-text text-warning">{state.errors.title}</small>
           )}
         </div>
 
@@ -40,12 +40,12 @@ export default function SuggestionFormComponent({ handler, suggestion }) {
           ></textarea>
           <label htmlFor="description">Descripción</label>
           {state?.errors?.description && (
-            <p className="error">{state.errors.description}</p>
+            <small className="form-text text-warning">{state.errors.description}</small>
           )}
         </div>
         <div className="mt-4 mb-0">
           <div className="d-grid">
-            <button disabled={isPending} className="btn btn-primary">
+            <button disabled={isPending} className="btn btn-outline-primary">
               {isPending ? (
                 <div className="spinner-border spinner-border-sm" role="status">
                   <span className="visually-hidden">Loading...</span>

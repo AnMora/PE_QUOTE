@@ -9,17 +9,15 @@ export default async function ShowSuggestion({ suggestion }) {
     <div id="layoutAuthentication_content">
       <main>
         <div className="container px-2">
-          <div className="card shadow-lg border-0 rounded-lg mt-2 mb-2">
+          <div className="card bg-dark mt-2 mb-2">
             <div className="card-header">
               <div className="d-flex bd-highlight">
                 <div className="w-100 p-2 bd-highlight">
                   <h2>{suggestion.title}</h2>
                 </div>
                 <div className="flex-shrink-1 p-1 bd-highlight">
-                  <p className="small">
-                    {suggestion._id.getTimestamp().toLocaleString()} por{" "}
-                    {suggestion.userFirstName} {suggestion.userLastName}
-                  </p>
+                  <span className="badge bg-warning rounded-pill me-1">{suggestion._id.getTimestamp().toLocaleString()}</span>
+                  <span className="badge bg-info rounded-pill me-1">{suggestion.userFirstName} {suggestion.userLastName}</span>
                 </div>
               </div>
             </div>
@@ -36,11 +34,11 @@ export default async function ShowSuggestion({ suggestion }) {
             {user.userId === suggestion.userId.toString() ? (
               <div className="card-footer d-flex align-items-center justify-content-end">
                 <Link href={`/suggestions/edit/${suggestion._id.toString()}`}>
-                  <button className="btn btn-info m-1">Editar</button>
+                  <button className="btn btn-outline-info m-1">Editar</button>
                 </Link>
                 <form action={deletePost}>
                   <input type="hidden" name="suggestionId" defaultValue={suggestion._id.toString()} />
-                  <button type="submit" className="btn btn-danger m-1" href="#">
+                  <button type="submit" className="btn btn-outline-danger m-1" href="#">
                     Eliminar
                   </button>
                 </form>
@@ -48,7 +46,7 @@ export default async function ShowSuggestion({ suggestion }) {
             ) : (
               <div className="card-footer d-flex align-items-center justify-content-end">
                 <Link href="/suggestions">
-                  <button className="btn btn-danger m-1">Volver</button>
+                  <button className="btn btn-outline-danger m-1">Volver</button>
                 </Link>
               </div>
             )}

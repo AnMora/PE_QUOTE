@@ -31,7 +31,7 @@ export default async function editSuggestion({ params }) {
       <div id="layoutAuthentication_content">
         <main>
           <div className="container px-2">
-            <div className="card shadow-lg border-0 rounded-lg mt-2 mb-2">
+            <div className="card bg-dark mt-2 mb-2">
               <div className="card-header">
                 <h3 className="text-center font-weight-light my-2">
                   Editar Sugerencia - Comentario
