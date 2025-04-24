@@ -1,7 +1,10 @@
+"use client"
+
 import { jsPDF } from "jspdf";
 import { useState } from "react";
 
-export default function QuoteView({ params, suggestion }) {
+export default function QuoteView({ params, inputs }) {      
+
   const [usuario, setUsuario] = useState("");
   const [paciente, setPaciente] = useState("");
   const [seleccionados, setSeleccionados] = useState([]);
@@ -62,8 +65,8 @@ export default function QuoteView({ params, suggestion }) {
   return (
     <form action="">
       {/* DATOS DE PACIENTE  */}
-        <div className="card bg-dark mb-2">
-        <div className="card-header">
+      <div className="card bg-dark mt-2 mb-2">
+        <div className="card-header text-success">
           <i className="fas fa-user fa-fw me-1"></i>
           Datos de paciente
         </div>
@@ -125,15 +128,15 @@ export default function QuoteView({ params, suggestion }) {
         </div>
       </div>
 
-      <div className="card bg-dark mb-2">
-        <div className="card-header">
+      <div className="card bg-dark mt-2 mb-2">
+        <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
           Insumos disponibles
         </div>
         <div className="card-body">
           {/* CAMPO DE BÚSQUEDA */}
           <div className="mb-1">
-          <div className="input-group">
+            <div className="input-group">
               <input
                 type="text"
                 className="form-control"
@@ -146,7 +149,9 @@ export default function QuoteView({ params, suggestion }) {
                 className="btn btn-primary"
                 id="btnNavbarSearch"
                 type="button"
-              ><i className="fas fa-search"></i></button>
+              >
+                <i className="fas fa-search"></i>
+              </button>
               {/* <label htmlFor="buscador">Buscar Insumos</label> */}
             </div>
           </div>
@@ -167,8 +172,8 @@ export default function QuoteView({ params, suggestion }) {
               </tr>
             </tfoot>
             <tbody>
-              {insumosActuales.map((insumo) => (
-                <tr className="table-dark" key={insumo.id}>
+              {insumos.map((insumo) => (
+                <tr className="table-dark" key={insumo._id}>
                   <td>{insumo.nombre}</td>
                   <td>${insumo.precio}</td>
                   <td>
@@ -186,7 +191,7 @@ export default function QuoteView({ params, suggestion }) {
           </table>
 
           {/* Paginación */}
-          <div>
+          <div >
             <ul className="pagination">
               <li
                 className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}
@@ -240,11 +245,11 @@ export default function QuoteView({ params, suggestion }) {
               </li>
             </ul>
           </div>
-          </div>
-          </div>
+        </div>
+      </div>
 
-          <div className="card bg-dark mb-2">
-        <div className="card-header">
+      <div className="card bg-dark mt-2 mb-2">
+        <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
           Insumos seleccionados
         </div>
@@ -260,12 +265,12 @@ export default function QuoteView({ params, suggestion }) {
                   </tr>
                 </thead>
                 <tfoot>
-              <tr className="table-dark">
-                <th scope="col">Nombre</th>
-                <th scope="col">Precio</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </tfoot>
+                  <tr className="table-dark">
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </tfoot>
                 <tbody>
                   {seleccionados.map((insumo, index) => (
                     <tr className="table-dark" key={index}>
@@ -302,7 +307,7 @@ export default function QuoteView({ params, suggestion }) {
             <p>No se han seleccionado insumos.</p>
           )}
         </div>
-        </div>
+      </div>
     </form>
   );
 }

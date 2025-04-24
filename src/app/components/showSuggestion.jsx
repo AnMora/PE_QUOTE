@@ -11,15 +11,15 @@ export default async function ShowSuggestion({ suggestion }) {
         <div className="container px-2">
           <div className="card bg-dark mt-2 mb-2">
             <div className="card-header">
-              <div className="d-flex bd-highlight">
-                <div className="w-100 p-2 bd-highlight">
-                  <h2>{suggestion.title}</h2>
-                </div>
-                <div className="flex-shrink-1 p-1 bd-highlight">
-                  <span className="badge bg-warning rounded-pill me-1">{suggestion._id.getTimestamp().toLocaleString()}</span>
-                  <span className="badge bg-info rounded-pill me-1">{suggestion.userFirstName} {suggestion.userLastName}</span>
-                </div>
+            <div className="text-primary">
+                {suggestion.title}
               </div>
+                <span className="badge bg-warning rounded-pill me-1">
+                  {suggestion._id.getTimestamp().toLocaleString()}
+                </span>
+                <span className="badge bg-info rounded-pill me-1">
+                  {suggestion.userFirstName} {suggestion.userLastName}
+                </span>
             </div>
             <div className="card-body">
               <p
@@ -37,8 +37,16 @@ export default async function ShowSuggestion({ suggestion }) {
                   <button className="btn btn-outline-info m-1">Editar</button>
                 </Link>
                 <form action={deletePost}>
-                  <input type="hidden" name="suggestionId" defaultValue={suggestion._id.toString()} />
-                  <button type="submit" className="btn btn-outline-danger m-1" href="#">
+                  <input
+                    type="hidden"
+                    name="suggestionId"
+                    defaultValue={suggestion._id.toString()}
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-outline-danger m-1"
+                    href="#"
+                  >
                     Eliminar
                   </button>
                 </form>

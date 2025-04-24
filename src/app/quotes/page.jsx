@@ -1,10 +1,13 @@
-"use client";
-
-import { useState } from "react";
-import { jsPDF } from "jspdf";
 import QuoteView from "../components/quoteView";
+import { getCollection } from "@/lib/db";
 
-export default function Quotes(params) {
+export default async function Quotes(params) {
+  const inputsCollection = await getCollection("Inputs");
+  const inputs = await inputsCollection
+    ?.find()
+    .sort({ $natural: -1 })
+    .toArray();
+  
   return (
     <>
       <h1 className="mt-4">Cotizador Principal</h1>
@@ -12,7 +15,7 @@ export default function Quotes(params) {
       <div id="layoutAuthentication_content">
         <main>
         <div className="container-fluid px-2">
-            <QuoteView handler="" />
+            <QuoteView inputs={inputs} />
           </div>
         </main>
       </div>

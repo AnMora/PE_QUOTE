@@ -9,10 +9,9 @@ export default async function createSuggestion(params) {
         <main>
           <div className="container px-2">
             <div className="card bg-dark mt-2 mb-2">
-              <div className="card-header">
-                <h3 className="text-center font-weight-light my-2">
-                  Crear Sugerencia - Comentario
-                </h3>
+              <div className="card-header text-success">
+                <i className="fas fa-book-open me-1"></i>
+                Crear sugerencias - comentarios
               </div>
               <SuggestionFormComponent handler={createPost} />
             </div>
