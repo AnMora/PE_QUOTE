@@ -1,47 +1,84 @@
-"use client"
-
+"use client";
 import { jsPDF } from "jspdf";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export default function QuoteView({ params, inputs }) {      
-
+export default function QuoteView({ inputs }) {
   const [usuario, setUsuario] = useState("");
   const [paciente, setPaciente] = useState("");
   const [seleccionados, setSeleccionados] = useState([]);
-  const [paginaActual, setPaginaActual] = useState(1);
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [insumosFiltrados, setInsumosFiltrados] = useState(inputs);
   const insumosPorPagina = 10;
+  const totalPaginas = Math.ceil(inputs.length / insumosPorPagina); // Total de páginas
 
-  const insumos = [
-    { id: 1, nombre: "Guantes", precio: 10 },
-    { id: 2, nombre: "Mascarillas", precio: 5 },
-    { id: 3, nombre: "Desinfectante", precio: 20 },
-    { id: 4, nombre: "Pañales", precio: 10 },
-    { id: 5, nombre: "Mascarillas", precio: 5 },
-    { id: 6, nombre: "Acetaminofen", precio: 20 },
-    { id: 7, nombre: "Guantes", precio: 10 },
-    { id: 8, nombre: "Mascarillas", precio: 5 },
-    { id: 9, nombre: "Desinfectante", precio: 20 },
-    { id: 10, nombre: "Algodones", precio: 10 },
-    { id: 11, nombre: "Mascarillas", precio: 5 },
-    { id: 12, nombre: "Desinfectante", precio: 20 },
-    { id: 13, nombre: "Guantes", precio: 10 },
-    { id: 14, nombre: "Mascarillas", precio: 5 },
-    { id: 15, nombre: "Desinfectante", precio: 20 },
-    { id: 16, nombre: "Mascarillas", precio: 5 },
-    { id: 17, nombre: "Desinfectante", precio: 20 },
-    { id: 18, nombre: "Guantes", precio: 10 },
-    { id: 19, nombre: "Mascarillas", precio: 5 },
-    { id: 20, nombre: "Desinfectante", precio: 20 },
-  ];
+  useEffect(() => {
+    const filteredInsumos = inputs.filter((insumo) => {
+      const numeroDelArticulo = insumo.numeroDelArticulo
+        ? insumo.numeroDelArticulo.toLowerCase().trim()
+        : "";
+      const descripcionDelArticulo = insumo.descripcionDelArticulo
+        ? insumo.descripcionDelArticulo.toLowerCase().trim()
+        : "";
+      return (
+        numeroDelArticulo.includes(terminoBusqueda.toLowerCase().trim()) ||
+        descripcionDelArticulo.includes(terminoBusqueda.toLowerCase().trim())
+      );
+    });
+    setInsumosFiltrados(filteredInsumos);
+  }, [terminoBusqueda, inputs]);
 
-  const agregarInsumo = (insumo) => {
-    setSeleccionados((prev) => [...prev, insumo]);
+  const renderPagination = () => {
+    const pages = [];
+    const maxVisiblePages = 5; // Número máximo de páginas a mostrar
+    const startPage = Math.max(
+      1,
+      paginaActual - Math.floor(maxVisiblePages / 2)
+    );
+    const endPage = Math.min(totalPaginas, startPage + maxVisiblePages - 1);
+    // Asegúrate de que el rango de páginas sea correcto
+    for (let i = startPage; i <= endPage; i++) {
+      if (i === startPage && i > 1) {
+        pages.push(
+          <li key="dot-start" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>
+        );
+      }
+      pages.push(
+        <li
+          key={i}
+          className={`page-item text-dark ${
+            paginaActual === i ? "active" : ""
+          }`}
+        >
+          <button
+            type="button"
+            className="page-link"
+            onClick={() => setPaginaActual(i)}
+          >
+            {i}
+          </button>
+        </li>
+      );
+      if (i === endPage && i < totalPaginas) {
+        pages.push(
+          <li key="dot-end" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>
+        );
+      }
+    }
+    return pages;
   };
 
-  const insumosFiltrados = insumos.filter((insumo) =>
-    insumo.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase())
-  );
+  const paginationStyle = {
+    fontSize: screenWidth < 576 ? "0.8rem" : "1rem",
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "20px",
+  };
 
   const indexOfLastInsumo = paginaActual * insumosPorPagina;
   const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
@@ -49,19 +86,46 @@ export default function QuoteView({ params, inputs }) {
     indexOfFirstInsumo,
     indexOfLastInsumo
   );
-  const totalPaginas = Math.ceil(insumosFiltrados.length / insumosPorPagina);
+
+  useEffect(() => {
+    const storedInsumos = localStorage.getItem("insumosSeleccionados");
+    if (storedInsumos) {
+      setSeleccionados(JSON.parse(storedInsumos));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("insumosSeleccionados", JSON.stringify(seleccionados));
+  }, [seleccionados]);
+
+  const agregarInsumo = (insumo) => {
+    setSeleccionados((prev) => [...prev, insumo]);
+  };
+  const eliminarInsumo = (index) => {
+    setSeleccionados((prev) => prev.filter((_, i) => i !== index));
+  };
+  const limpiarSeleccionados = () => {
+    setSeleccionados([]);
+    localStorage.removeItem("insumosSeleccionados"); // Limpiar también el localStorage
+  };
+
   const generarPDF = () => {
     const doc = new jsPDF();
-    doc.text(`Responsable: ${usuario}`, 10, 10);
-    doc.text(`Paciente: ${paciente}`, 10, 20);
+    doc.text(`Responsable: {usuario}`, 10, 10);
+    doc.text(`Paciente: {paciente}`, 10, 20);
     doc.text("Insumos Seleccionados:", 10, 30);
     let y = 40; // Posición vertical inicial
     seleccionados.forEach((insumo) => {
-      doc.text(`${insumo.nombre} - $${insumo.precio}`, 10, y);
+      doc.text(
+        `${insumo.numeroDelArticulo} - ${insumo.descripcionDelArticulo} - ${insumo.pacIntCOL}`,
+        10,
+        y
+      );
       y += 10;
     });
     doc.save("cotizacion.pdf");
   };
+
   return (
     <form action="">
       {/* DATOS DE PACIENTE  */}
@@ -127,7 +191,6 @@ export default function QuoteView({ params, inputs }) {
           </div>
         </div>
       </div>
-
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
@@ -152,30 +215,31 @@ export default function QuoteView({ params, inputs }) {
               >
                 <i className="fas fa-search"></i>
               </button>
-              {/* <label htmlFor="buscador">Buscar Insumos</label> */}
             </div>
           </div>
-
           <table className="table table-hover table-bordered">
             <thead>
               <tr className="table-dark">
-                <th scope="col">Nombre</th>
-                <th scope="col">Precio</th>
+                <th scope="col">Nombre del Artículo</th>
+                <th scope="col">Descripción del Artículo</th>
+                <th scope="col">Precio (COL)</th>
                 <th scope="col">Acciones</th>
               </tr>
             </thead>
             <tfoot>
               <tr className="table-dark">
-                <th scope="col">Nombre</th>
-                <th scope="col">Precio</th>
+                <th scope="col">Nombre del Artículo</th>
+                <th scope="col">Descripción del Artículo</th>
+                <th scope="col">Precio (COL)</th>
                 <th scope="col">Acciones</th>
               </tr>
             </tfoot>
             <tbody>
-              {insumos.map((insumo) => (
-                <tr className="table-dark" key={insumo._id}>
-                  <td>{insumo.nombre}</td>
-                  <td>${insumo.precio}</td>
+              {insumosActuales.map((insumo) => (
+                <tr className="table-dark" key={insumo.id}>
+                  <td>{insumo.numeroDelArticulo}</td>
+                  <td>{insumo.descripcionDelArticulo}</td>
+                  <td>{insumo.pacIntCOL}</td>
                   <td>
                     <button
                       type="button"
@@ -189,12 +253,11 @@ export default function QuoteView({ params, inputs }) {
               ))}
             </tbody>
           </table>
-
           {/* Paginación */}
-          <div >
+          <div style={paginationStyle}>
             <ul className="pagination">
               <li
-                className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}
+                className={`page-item {paginaActual === 1 ? "disabled" : ""}`}
               >
                 <button
                   type="button"
@@ -207,26 +270,9 @@ export default function QuoteView({ params, inputs }) {
                   &laquo;
                 </button>
               </li>
-              {Array.from({ length: totalPaginas }, (_, index) => (
-                <li
-                  key={index + 1}
-                  className={`page-item ${
-                    paginaActual === index + 1 ? "primary" : ""
-                  }`}
-                >
-                  <button
-                    type="button"
-                    className="page-link"
-                    onClick={() => setPaginaActual(index + 1)}
-                  >
-                    {index + 1}
-                  </button>
-                </li>
-              ))}
+              {renderPagination()}
               <li
-                className={`page-item ${
-                  paginaActual === totalPaginas ? "disabled" : ""
-                }`}
+                className={`page-item {paginaActual === totalPaginas ? "disabled" : ""}`}
               >
                 <button
                   type="button"
@@ -247,7 +293,6 @@ export default function QuoteView({ params, inputs }) {
           </div>
         </div>
       </div>
-
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
@@ -259,32 +304,31 @@ export default function QuoteView({ params, inputs }) {
               <table className="table table-hover table-bordered">
                 <thead>
                   <tr className="table-dark">
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Precio</th>
+                    <th scope="col">Nombre del Artículo</th>
+                    <th scope="col">Descripción del Artículo</th>
+                    <th scope="col">Precio (COL)</th>
                     <th scope="col">Acciones</th>
                   </tr>
                 </thead>
                 <tfoot>
                   <tr className="table-dark">
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Precio</th>
+                    <th scope="col">Nombre del Artículo</th>
+                    <th scope="col">Descripción del Artículo</th>
+                    <th scope="col">Precio (COL)</th>
                     <th scope="col">Acciones</th>
                   </tr>
                 </tfoot>
                 <tbody>
                   {seleccionados.map((insumo, index) => (
                     <tr className="table-dark" key={index}>
-                      <td>{insumo.nombre}</td>
-                      <td>${insumo.precio}</td>
+                      <td>{insumo.numeroDelArticulo}</td>
+                      <td>{insumo.descripcionDelArticulo}</td>
+                      <td>{insumo.pacIntCOL}</td>
                       <td>
                         <button
                           type="button"
                           className="btn btn-outline-danger"
-                          onClick={() => {
-                            setSeleccionados(
-                              seleccionados.filter((_, i) => i !== index)
-                            );
-                          }}
+                          onClick={() => eliminarInsumo(index)}
                         >
                           Eliminar
                         </button>
@@ -295,11 +339,19 @@ export default function QuoteView({ params, inputs }) {
               </table>
               <div className="d-grid">
                 <button
+                  type="button"
                   className="btn btn-outline-primary mt-2 mb-2"
                   onClick={generarPDF}
                   disabled={seleccionados.length === 0}
                 >
                   Generar PDF
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-danger mt-2 mb-2"
+                  onClick={limpiarSeleccionados}
+                >
+                  Limpiar Seleccionados
                 </button>
               </div>
             </div>
@@ -311,11 +363,3 @@ export default function QuoteView({ params, inputs }) {
     </form>
   );
 }
-
-// ** VAN HACER 3 FORMULARIOS
-// ** 1. Datos de paciente
-// ** 2. Cotizacion de insumos
-// ** 3. Insumos Cotizados
-// ** 4. Mostrar el total de insumos
-// ** Aplicar porcentaje : ya se ms o seguro
-// ** Costo total con porcentaje
