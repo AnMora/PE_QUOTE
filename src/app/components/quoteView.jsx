@@ -1,26 +1,40 @@
 "use client";
+
 import { jsPDF } from "jspdf";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 export default function QuoteView({ inputs }) {
-  const [usuario, setUsuario] = useState("");
-  const [paciente, setPaciente] = useState("");
-  const [seleccionados, setSeleccionados] = useState([]);
+  const [user, setUser] = useState("");
+  const [dayOfBirth, setDayOfBirth] = useState("");
+  const [email, setEmail] = useState("");
+  const [diagnostic, setDiagnostic] = useState("");
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [insumosFiltrados, setInsumosFiltrados] = useState(inputs);
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [screenWidth, setScreenWidth] = useState(0);
+  const [requiereSeguro, setRequiereSeguro] = useState(false);
+  const [porcentajeAPagar, setPorcentajeAPagar] = useState(20);
   const insumosPorPagina = 10;
-  const totalPaginas = Math.ceil(inputs.length / insumosPorPagina); // Total de páginas
+  const totalPaginas = Math.ceil(inputs.length / insumosPorPagina);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+    handleResize(); // Establece el valor inicial
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const filteredInsumos = inputs.filter((insumo) => {
-      const numeroDelArticulo = insumo.numeroDelArticulo
-        ? insumo.numeroDelArticulo.toLowerCase().trim()
-        : "";
-      const descripcionDelArticulo = insumo.descripcionDelArticulo
-        ? insumo.descripcionDelArticulo.toLowerCase().trim()
-        : "";
+      const numeroDelArticulo =
+        insumo.numeroDelArticulo?.toLowerCase().trim() || "";
+      const descripcionDelArticulo =
+        insumo.descripcionDelArticulo?.toLowerCase().trim() || "";
       return (
         numeroDelArticulo.includes(terminoBusqueda.toLowerCase().trim()) ||
         descripcionDelArticulo.includes(terminoBusqueda.toLowerCase().trim())
@@ -28,6 +42,78 @@ export default function QuoteView({ inputs }) {
     });
     setInsumosFiltrados(filteredInsumos);
   }, [terminoBusqueda, inputs]);
+
+  const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
+    const precio = insumo.pacIntCOL
+      ? typeof insumo.pacIntCOL === "string"
+        ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
+        : parseFloat(insumo.pacIntCOL) || 0
+      : 0; // Si es undefined o null, usar 0
+    return acc + precio;
+  }, 0);
+  const impuesto = useMemo(() => totalSinImpuesto * 0.04, [totalSinImpuesto]);
+  const totalConImpuesto = useMemo(
+    () => totalSinImpuesto + impuesto,
+    [totalSinImpuesto, impuesto]
+  );
+  const totalConSeguro = useMemo(
+    () =>
+      requiereSeguro
+        ? totalConImpuesto * (porcentajeAPagar / 100)
+        : totalConImpuesto,
+    [requiereSeguro, totalConImpuesto, porcentajeAPagar]
+  );
+  useEffect(() => {
+    const storedInsumos = localStorage.getItem("insumosSeleccionados");
+    if (storedInsumos) {
+      setSeleccionados(JSON.parse(storedInsumos));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("insumosSeleccionados", JSON.stringify(seleccionados));
+  }, [seleccionados]);
+
+  const agregarInsumo = (insumo) => {
+    setSeleccionados((prev) => [...prev, insumo]);
+  };
+  const eliminarInsumo = (index) => {
+    setSeleccionados((prev) => prev.filter((_, i) => i !== index));
+  };
+  const limpiarSeleccionados = () => {
+    setSeleccionados([]);
+    localStorage.removeItem("insumosSeleccionados");
+  };
+
+  const generarPDF = () => {
+    const doc = new jsPDF();
+    doc.text(`Responsable: ${user}`, 10, 10);
+    doc.text(`Paciente: ${email}`, 10, 20);
+    doc.text("Insumos Seleccionados:", 10, 30);
+    let y = 40;
+    seleccionados.forEach((insumo) => {
+      doc.text(
+        `${insumo.numeroDelArticulo} - ${insumo.descripcionDelArticulo} - ${insumo.pacIntCOL}`,
+        10,
+        y
+      );
+      y += 10;
+    });
+    doc.save("cotizacion.pdf");
+  };
+  const indexOfLastInsumo = paginaActual * insumosPorPagina;
+  const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
+  const insumosActuales = insumosFiltrados.slice(
+    indexOfFirstInsumo,
+    indexOfLastInsumo
+  );
+
+  const paginationStyle = {
+    fontSize: screenWidth < 576 ? "0.8rem" : "1rem",
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "20px",
+  };
 
   const renderPagination = () => {
     const pages = [];
@@ -73,62 +159,8 @@ export default function QuoteView({ inputs }) {
     return pages;
   };
 
-  const paginationStyle = {
-    fontSize: screenWidth < 576 ? "0.8rem" : "1rem",
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "20px",
-  };
-
-  const indexOfLastInsumo = paginaActual * insumosPorPagina;
-  const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
-  const insumosActuales = insumosFiltrados.slice(
-    indexOfFirstInsumo,
-    indexOfLastInsumo
-  );
-
-  useEffect(() => {
-    const storedInsumos = localStorage.getItem("insumosSeleccionados");
-    if (storedInsumos) {
-      setSeleccionados(JSON.parse(storedInsumos));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("insumosSeleccionados", JSON.stringify(seleccionados));
-  }, [seleccionados]);
-
-  const agregarInsumo = (insumo) => {
-    setSeleccionados((prev) => [...prev, insumo]);
-  };
-  const eliminarInsumo = (index) => {
-    setSeleccionados((prev) => prev.filter((_, i) => i !== index));
-  };
-  const limpiarSeleccionados = () => {
-    setSeleccionados([]);
-    localStorage.removeItem("insumosSeleccionados"); // Limpiar también el localStorage
-  };
-
-  const generarPDF = () => {
-    const doc = new jsPDF();
-    doc.text(`Responsable: {usuario}`, 10, 10);
-    doc.text(`Paciente: {paciente}`, 10, 20);
-    doc.text("Insumos Seleccionados:", 10, 30);
-    let y = 40; // Posición vertical inicial
-    seleccionados.forEach((insumo) => {
-      doc.text(
-        `${insumo.numeroDelArticulo} - ${insumo.descripcionDelArticulo} - ${insumo.pacIntCOL}`,
-        10,
-        y
-      );
-      y += 10;
-    });
-    doc.save("cotizacion.pdf");
-  };
-
   return (
-    <form action="">
-      {/* DATOS DE PACIENTE  */}
+    <form action={""}>
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-user fa-fw me-1"></i>
@@ -145,7 +177,7 @@ export default function QuoteView({ inputs }) {
                   type="text"
                   name="fullName"
                   placeholder="Ingrese nombre completo paciente"
-                  onChange={(e) => setUsuario(e.target.value)}
+                  onChange={(e) => setUser(e.target.value)}
                 />
                 <label htmlFor="inputFirstName">Nombre Completo</label>
               </div>
@@ -158,6 +190,7 @@ export default function QuoteView({ inputs }) {
                   type="text"
                   name="DayOfBirth"
                   placeholder="Ingrese fecha de nacimiento paciente"
+                  onChange={(e) => setDayOfBirth(e.target.value)}
                 />
                 <label htmlFor="inputLastName">Fecha de nacimiento</label>
               </div>
@@ -172,6 +205,7 @@ export default function QuoteView({ inputs }) {
                   type="text"
                   name="emailAddress"
                   placeholder="Ingrese correo electronico paciente"
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <label htmlFor="inputFirstName">Correo Electrónico</label>
               </div>
@@ -184,6 +218,7 @@ export default function QuoteView({ inputs }) {
                   type="text"
                   name="patientDiagnosis"
                   placeholder="Ingrese diagnostico de paciente"
+                  onChange={(e) => setDiagnostic(e.target.value)}
                 />
                 <label htmlFor="inputLastName">Diagnóstico</label>
               </div>
@@ -222,7 +257,8 @@ export default function QuoteView({ inputs }) {
               <tr className="table-dark">
                 <th scope="col">Nombre del Artículo</th>
                 <th scope="col">Descripción del Artículo</th>
-                <th scope="col">Precio (COL)</th>
+                <th scope="col">Precio Ext (COL)</th>
+                <th scope="col">Precio Int (COL)</th>
                 <th scope="col">Acciones</th>
               </tr>
             </thead>
@@ -230,7 +266,8 @@ export default function QuoteView({ inputs }) {
               <tr className="table-dark">
                 <th scope="col">Nombre del Artículo</th>
                 <th scope="col">Descripción del Artículo</th>
-                <th scope="col">Precio (COL)</th>
+                <th scope="col">Precio Ext (COL)</th>
+                <th scope="col">Precio Int (COL)</th>
                 <th scope="col">Acciones</th>
               </tr>
             </tfoot>
@@ -239,7 +276,8 @@ export default function QuoteView({ inputs }) {
                 <tr className="table-dark" key={insumo.id}>
                   <td>{insumo.numeroDelArticulo}</td>
                   <td>{insumo.descripcionDelArticulo}</td>
-                  <td>{insumo.pacIntCOL}</td>
+                  <td>{insumo.pacExtCOL}</td>
+                  <td className="text-warning">{insumo.pacIntCOL}</td>
                   <td>
                     <button
                       type="button"
@@ -254,10 +292,11 @@ export default function QuoteView({ inputs }) {
             </tbody>
           </table>
           {/* Paginación */}
+
           <div style={paginationStyle}>
             <ul className="pagination">
               <li
-                className={`page-item {paginaActual === 1 ? "disabled" : ""}`}
+                className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}
               >
                 <button
                   type="button"
@@ -270,9 +309,11 @@ export default function QuoteView({ inputs }) {
                   &laquo;
                 </button>
               </li>
-              {renderPagination()}
+              {renderPagination()} {/* Asegúrate de que esta línea esté aquí */}
               <li
-                className={`page-item {paginaActual === totalPaginas ? "disabled" : ""}`}
+                className={`page-item ${
+                  paginaActual === totalPaginas ? "disabled" : ""
+                }`}
               >
                 <button
                   type="button"
@@ -306,24 +347,85 @@ export default function QuoteView({ inputs }) {
                   <tr className="table-dark">
                     <th scope="col">Nombre del Artículo</th>
                     <th scope="col">Descripción del Artículo</th>
-                    <th scope="col">Precio (COL)</th>
+                    <th scope="col">Precio Int (COL)</th>
                     <th scope="col">Acciones</th>
                   </tr>
                 </thead>
                 <tfoot>
                   <tr className="table-dark">
-                    <th scope="col">Nombre del Artículo</th>
-                    <th scope="col">Descripción del Artículo</th>
-                    <th scope="col">Precio (COL)</th>
-                    <th scope="col">Acciones</th>
+                    <th colSpan="2" className="text-end">
+                      Costos Totales
+                    </th>
+                    <th colSpan="2" className="text-end">
+                      Montos Totales
+                    </th>
                   </tr>
+                  <tr className="table-dark">
+                    <td colSpan="2" className="text-end">
+                      Total sin Impuesto:
+                    </td>
+                    <td colSpan="2" className="text-end text-warning">
+                      {totalSinImpuesto.toFixed(2)}
+                    </td>
+                  </tr>
+                  <tr className="table-dark">
+                    <td colSpan="2" className="text-end">
+                      Total con Impuesto (4%):
+                    </td>
+                    <td colSpan="2" className="text-end text-warning">
+                      {totalConImpuesto.toFixed(2)}
+                    </td>
+                  </tr>
+                  <tr className="table-dark">
+                    <td colSpan="2" className="text-end">
+                      Requiere seguro
+                    </td>
+                    <td colSpan="2" className="text-end text-warning">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={requiereSeguro}
+                        onChange={(e) => setRequiereSeguro(e.target.checked)}
+                      />
+                    </td>
+                  </tr>
+                  {requiereSeguro && (
+                    <>
+                      <tr className="table-dark">
+                        <td colSpan="2" className="text-end">
+                          Porcentaje a Pagar (%):
+                        </td>
+                        <td colSpan="2">
+                          <input
+                            className="form-control text-end"
+                            type="text"
+                            id="porcentajeAPagar"
+                            value={porcentajeAPagar}
+                            onChange={(e) =>
+                              setPorcentajeAPagar(
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                          />
+                        </td>
+                      </tr>
+                      <tr className="table-dark">
+                        <td colSpan="2" className="text-end">
+                          Total con Seguro:
+                        </td>
+                        <td colSpan="2" className="text-end text-warning">
+                          {totalConSeguro.toFixed(2)}
+                        </td>
+                      </tr>
+                    </>
+                  )}
                 </tfoot>
                 <tbody>
                   {seleccionados.map((insumo, index) => (
                     <tr className="table-dark" key={index}>
                       <td>{insumo.numeroDelArticulo}</td>
                       <td>{insumo.descripcionDelArticulo}</td>
-                      <td>{insumo.pacIntCOL}</td>
+                      <td className="text-warning">{insumo.pacIntCOL}</td>
                       <td>
                         <button
                           type="button"
@@ -337,27 +439,27 @@ export default function QuoteView({ inputs }) {
                   ))}
                 </tbody>
               </table>
-              <div className="d-grid">
-                <button
-                  type="button"
-                  className="btn btn-outline-primary mt-2 mb-2"
-                  onClick={generarPDF}
-                  disabled={seleccionados.length === 0}
-                >
-                  Generar PDF
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-danger mt-2 mb-2"
-                  onClick={limpiarSeleccionados}
-                >
-                  Limpiar Seleccionados
-                </button>
-              </div>
             </div>
           ) : (
             <p>No se han seleccionado insumos.</p>
           )}
+        </div>
+        <div className="card-footer d-flex align-items-center justify-content-end">
+          <button
+            type="button"
+            className="btn btn-outline-primary mt-2 mb-2 m-1"
+            onClick={generarPDF}
+            disabled={seleccionados.length === 0}
+          >
+            Generar PDF
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-danger mt-2 mb-2 m-1"
+            onClick={limpiarSeleccionados}
+          >
+            Limpiar Seleccionados
+          </button>
         </div>
       </div>
     </form>
