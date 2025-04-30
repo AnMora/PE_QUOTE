@@ -4,23 +4,26 @@ export const RegisterFormSchema = z
   .object({
     firstName: z
       .string()
-      .min(3, { message: "The first name field is required" })
-      .max(12, { message: "Can't be more than 12 characters" })
+      .min(3, { message: "El nombre de usuario es requerido" })
+      .max(12, { message: "El nombre no puede ser más de 12 caracteres" })
       .trim(),
     lastName: z
       .string()
-      .min(3, { message: "The last name field is required" })
-      .max(12, { message: "Can't be more than 12 characters" })
+      .min(3, { message: "El apellido de usuario es requerido" })
+      .max(12, { message: "El apellido no puede ser más de 12 caracteres" })
       .trim(),
-    email: z.string().email({ message: "Please enter a valid email" }).trim(),
+    email: z
+      .string()
+      .email({ message: "Ingrese un formato de correo valido" })
+      .trim(),
     password: z
       .string()
-      .min(1, { message: "Not be empty" })
-      .min(5, { message: "Be at least 5 characters long" })
-      .regex(/[a-zA-Z]/, { message: "Contain at least one letter" })
-      .regex(/[0-9]/, { message: "Contain at least one number" })
+      .min(1, { message: "No debe estar vacío" })
+      .min(5, { message: "Debe tener al menos 5 caracteres de longitud" })
+      .regex(/[a-zA-Z]/, { message: "Debe contener al menos una letra" })
+      .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
       .regex(/[a-zA-Z0-9]/, {
-        message: "Contain at least one special character",
+        message: "Debe contener al menos un carácter especial",
       })
       .trim(),
     confirmPassword: z.string().trim(),
@@ -29,26 +32,29 @@ export const RegisterFormSchema = z
     if (value.password !== value.confirmPassword) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Password fields do not match.",
+        message: "La contraseña no coincide, verifique de nuevo",
         path: ["confirmPassword"],
       });
     }
   });
 
 export const LoginFormSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email" }).trim(),
-  password: z.string().min(1, { message: "Password is required" }).trim(),
+  email: z
+    .string()
+    .email({ message: "Ingrese un formato de correo valido" })
+    .trim(),
+  password: z.string().min(1, { message: "Contraseña es requerida" }).trim(),
 });
 
 export const SuggestionFormSchema = z.object({
   title: z
     .string()
-    .min(1, { message: "Title field is required" })
-    .max(40, { message: "Title can't be more than 40 characters" })
+    .min(1, { message: "El titulo es requerido" })
+    .max(40, { message: "El titulo no puede tener más de 40 caracteres" })
     .trim(),
 
   description: z
     .string()
-    .min(1, { message: "Description field is required" })
+    .min(1, { message: "La descripción es requerida" })
     .trim(),
 });

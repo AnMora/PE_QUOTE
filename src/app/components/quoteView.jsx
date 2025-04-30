@@ -1,13 +1,16 @@
 "use client";
 
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import React, { useEffect, useState, useMemo } from "react";
 
 export default function QuoteView({ inputs }) {
-  const [user, setUser] = useState("");
+  const [patient, setPatient] = useState("");
   const [dayOfBirth, setDayOfBirth] = useState("");
   const [email, setEmail] = useState("");
   const [diagnostic, setDiagnostic] = useState("");
+  const [formErrors, setFormErrors] = useState({});
+
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [insumosFiltrados, setInsumosFiltrados] = useState(inputs);
   const [seleccionados, setSeleccionados] = useState([]);
@@ -22,7 +25,7 @@ export default function QuoteView({ inputs }) {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
     };
-    handleResize(); // Establece el valor inicial
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -48,10 +51,17 @@ export default function QuoteView({ inputs }) {
       ? typeof insumo.pacIntCOL === "string"
         ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
         : parseFloat(insumo.pacIntCOL) || 0
-      : 0; // Si es undefined o null, usar 0
+      : 0;
     return acc + precio;
   }, 0);
+
+  if (typeof totalSinImpuesto !== 'number' || isNaN(totalSinImpuesto)) {
+      console.error('totalSinImpuesto no es un número:', totalSinImpuesto);
+      totalSinImpuesto = 0;
+  }
+
   const impuesto = useMemo(() => totalSinImpuesto * 0.04, [totalSinImpuesto]);
+  
   const totalConImpuesto = useMemo(
     () => totalSinImpuesto + impuesto,
     [totalSinImpuesto, impuesto]
@@ -86,21 +96,108 @@ export default function QuoteView({ inputs }) {
   };
 
   const generarPDF = () => {
-    const doc = new jsPDF();
-    doc.text(`Responsable: ${user}`, 10, 10);
-    doc.text(`Paciente: ${email}`, 10, 20);
-    doc.text("Insumos Seleccionados:", 10, 30);
-    let y = 40;
-    seleccionados.forEach((insumo) => {
-      doc.text(
-        `${insumo.numeroDelArticulo} - ${insumo.descripcionDelArticulo} - ${insumo.pacIntCOL}`,
-        10,
-        y
-      );
-      y += 10;
+    const doc = new jsPDF('landscape'); 
+    doc.setFontSize(9); 
+    const datosPaciente = [
+        `Responsable: ${patient}`,
+        `Fecha de Nacimiento: ${dayOfBirth}`,
+        `Correo Electrónico: ${email}`,
+        `Diagnóstico: ${diagnostic}`
+    ];
+    
+    let y = 10; 
+    datosPaciente.forEach((line, index) => {
+        doc.text(line, 10, y + (index * 8));
     });
+    y += 40;
+    const headers = ["Nombre del Artículo", "Descripción", "Precio"];
+    const rows = seleccionados.map(insumo => [
+        insumo.numeroDelArticulo,
+        insumo.descripcionDelArticulo,
+        insumo.pacIntCOL
+    ]);
+
+    // ** Generador de la tabla
+    autoTable(doc, {
+        head: [headers],
+        body: rows,
+        startY: y,
+        theme: 'grid',
+        styles: {
+            fontSize: 9
+        }
+    });
+  
+    const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
+        const precio = insumo.pacIntCOL
+            ? typeof insumo.pacIntCOL === "string"
+                ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
+                : parseFloat(insumo.pacIntCOL) || 0
+            : 0;
+        return acc + precio;
+    }, 0);
+    
+    const impuesto = totalSinImpuesto * 0.04;
+    const totalConImpuesto = totalSinImpuesto + impuesto;
+
+    // ** Mostrador  totales
+    doc.setFontSize(9);
+    const yFinal = doc.lastAutoTable.finalY + 10; 
+    doc.text(`Total sin Impuesto: $${totalSinImpuesto.toFixed(2)}`, 10, yFinal);
+    doc.text(`Impuesto (4%): $${impuesto.toFixed(2)}`, 10, yFinal + 10);
+    doc.text(`Total con Impuesto: $${totalConImpuesto.toFixed(2)}`, 10, yFinal + 20);
+
+    if (yFinal + 30 > 210) {
+        doc.addPage();
+        
+        datosPaciente.forEach((line, index) => {
+            doc.text(line, 10, 10 + (index * 8));
+        });
+        
+        doc.text("Insumos Seleccionados:", 10, 40);
+        
+        autoTable(doc, {
+            head: [headers],
+            body: rows,
+            startY: 50,
+            theme: 'grid',
+            styles: {
+                fontSize: 9
+            }
+        });
+        
+        const newYFinal = doc.lastAutoTable.finalY + 10;
+        doc.text(`Total sin Impuesto: $${totalSinImpuesto.toFixed(2)}`, 10, newYFinal);
+        doc.text(`Impuesto (4%): $${impuesto.toFixed(2)}`, 10, newYFinal + 10);
+        doc.text(`Total con Impuesto: $${totalConImpuesto.toFixed(2)}`, 10, newYFinal + 20);
+    }
+    
+    // ** GENERA Y GUARDA EL PDF
     doc.save("cotizacion.pdf");
+};
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    const trimmedPatient = patient.trim();
+    const trimmedDayOfBirth = dayOfBirth.trim();
+    const trimmedEmail = email.trim();
+    const trimmedDiagnostic = diagnostic.trim();
+    if (
+      !trimmedPatient ||
+      !trimmedDayOfBirth ||
+      !trimmedEmail ||
+      !trimmedDiagnostic
+    ) {
+      setFormErrors({
+        general: "Todos los campos son obligatorios y no pueden estar vacíos.",
+      });
+      return;
+    }
+    
+    generarPDF();
   };
+
   const indexOfLastInsumo = paginaActual * insumosPorPagina;
   const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
   const insumosActuales = insumosFiltrados.slice(
@@ -117,13 +214,13 @@ export default function QuoteView({ inputs }) {
 
   const renderPagination = () => {
     const pages = [];
-    const maxVisiblePages = 5; // Número máximo de páginas a mostrar
+    const maxVisiblePages = 10;
     const startPage = Math.max(
       1,
       paginaActual - Math.floor(maxVisiblePages / 2)
     );
     const endPage = Math.min(totalPaginas, startPage + maxVisiblePages - 1);
-    // Asegúrate de que el rango de páginas sea correcto
+    
     for (let i = startPage; i <= endPage; i++) {
       if (i === startPage && i > 1) {
         pages.push(
@@ -160,7 +257,7 @@ export default function QuoteView({ inputs }) {
   };
 
   return (
-    <form action={""}>
+    <form onSubmit={handleSubmit}>
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-user fa-fw me-1"></i>
@@ -175,9 +272,9 @@ export default function QuoteView({ inputs }) {
                   className="form-control"
                   id="inputFirstName"
                   type="text"
-                  name="fullName"
+                  name="patient"
                   placeholder="Ingrese nombre completo paciente"
-                  onChange={(e) => setUser(e.target.value)}
+                  onChange={(e) => setPatient(e.target.value)}
                 />
                 <label htmlFor="inputFirstName">Nombre Completo</label>
               </div>
@@ -188,7 +285,7 @@ export default function QuoteView({ inputs }) {
                   className="form-control"
                   id="inputLastName"
                   type="text"
-                  name="DayOfBirth"
+                  name="dayOfBirth"
                   placeholder="Ingrese fecha de nacimiento paciente"
                   onChange={(e) => setDayOfBirth(e.target.value)}
                 />
@@ -216,7 +313,7 @@ export default function QuoteView({ inputs }) {
                   className="form-control"
                   id="inputLastName"
                   type="text"
-                  name="patientDiagnosis"
+                  name="patientDiagnostic"
                   placeholder="Ingrese diagnostico de paciente"
                   onChange={(e) => setDiagnostic(e.target.value)}
                 />
@@ -309,7 +406,7 @@ export default function QuoteView({ inputs }) {
                   &laquo;
                 </button>
               </li>
-              {renderPagination()} {/* Asegúrate de que esta línea esté aquí */}
+              {renderPagination()}
               <li
                 className={`page-item ${
                   paginaActual === totalPaginas ? "disabled" : ""
@@ -445,10 +542,14 @@ export default function QuoteView({ inputs }) {
           )}
         </div>
         <div className="card-footer d-flex align-items-center justify-content-end">
+          {formErrors.general && (
+            <small className="form-text text-warning text-end m-1">
+              {formErrors.general}
+            </small>
+          )}
           <button
-            type="button"
+            type="submit"
             className="btn btn-outline-primary mt-2 mb-2 m-1"
-            onClick={generarPDF}
             disabled={seleccionados.length === 0}
           >
             Generar PDF

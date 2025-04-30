@@ -2,7 +2,7 @@
 
 import { getCollection } from "@/lib/db";
 import getAuthUser from "@/lib/getAuthUser";
-import { SuggestionFormSchema } from "@/lib/rules";
+import { QuoterFormSchema, SuggestionFormSchema } from "@/lib/rules";
 import { errors } from "jose";
 import { ObjectId } from "mongodb";
 import { requestToBodyStream } from "next/dist/server/body-streams";
