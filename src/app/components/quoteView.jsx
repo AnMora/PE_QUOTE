@@ -55,13 +55,13 @@ export default function QuoteView({ inputs }) {
     return acc + precio;
   }, 0);
 
-  if (typeof totalSinImpuesto !== 'number' || isNaN(totalSinImpuesto)) {
-      console.error('totalSinImpuesto no es un número:', totalSinImpuesto);
-      totalSinImpuesto = 0;
+  if (typeof totalSinImpuesto !== "number" || isNaN(totalSinImpuesto)) {
+    console.error("totalSinImpuesto no es un número:", totalSinImpuesto);
+    totalSinImpuesto = 0;
   }
 
   const impuesto = useMemo(() => totalSinImpuesto * 0.04, [totalSinImpuesto]);
-  
+
   const totalConImpuesto = useMemo(
     () => totalSinImpuesto + impuesto,
     [totalSinImpuesto, impuesto]
@@ -96,89 +96,131 @@ export default function QuoteView({ inputs }) {
   };
 
   const generarPDF = () => {
-    const doc = new jsPDF('landscape'); 
-    doc.setFontSize(9); 
+    const doc = new jsPDF("landscape");
+    doc.setFontSize(9);
+    // Datos del paciente
     const datosPaciente = [
-        `Responsable: ${patient}`,
-        `Fecha de Nacimiento: ${dayOfBirth}`,
-        `Correo Electrónico: ${email}`,
-        `Diagnóstico: ${diagnostic}`
+      ["Paciente", patient],
+      ["Fecha de Nacimiento", dayOfBirth],
+      ["Correo Electrónico", email],
     ];
-    
-    let y = 10; 
-    datosPaciente.forEach((line, index) => {
-        doc.text(line, 10, y + (index * 8));
-    });
-    y += 40;
-    const headers = ["Nombre del Artículo", "Descripción", "Precio"];
-    const rows = seleccionados.map(insumo => [
-        insumo.numeroDelArticulo,
-        insumo.descripcionDelArticulo,
-        insumo.pacIntCOL
-    ]);
-
-    // ** Generador de la tabla
+    // Tabla de datos del paciente
     autoTable(doc, {
-        head: [headers],
-        body: rows,
-        startY: y,
-        theme: 'grid',
-        styles: {
-            fontSize: 9
-        }
+      head: [["Datos de Paciente", ""]],
+      body: datosPaciente,
+      startY: 10,
+      theme: "striped",
+      styles: {
+        fontSize: 9,
+      },
     });
-  
+    // Espacio entre tablas
+    let y = doc.lastAutoTable.finalY + 5;
+    // Diagnóstico
+    const diagnostico = [["Diagnóstico", diagnostic]];
+    // Tabla de diagnóstico
+    autoTable(doc, {
+      head: [["Procedimientos", ""]],
+      body: diagnostico,
+      startY: y,
+      theme: "striped",
+      styles: {
+        fontSize: 9,
+      },
+    });
+    // Espacio entre tablas
+    y = doc.lastAutoTable.finalY + 0;
+    // Insumos
+    const headers = [
+      "Nombre del Artículo",
+      "Descripción del Artículo",
+      "Costo del Artículo",
+    ];
+    const rows = seleccionados.map((insumo) => [
+      insumo.numeroDelArticulo,
+      insumo.descripcionDelArticulo,
+      insumo.pacIntCOL,
+    ]);
+    // Tabla de insumos
+    autoTable(doc, {
+      head: [headers],
+      body: rows,
+      startY: y,
+      theme: "striped",
+      styles: {
+        fontSize: 9,
+      },
+      columnStyles: {
+        0: { halign: "left" },
+        1: { halign: "left" },
+        2: { halign: "right" },
+      },
+    });
+    // Espacio entre tablas
+    y = doc.lastAutoTable.finalY + 5;
+    // Cálculo de totales
     const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
-        const precio = insumo.pacIntCOL
-            ? typeof insumo.pacIntCOL === "string"
-                ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
-                : parseFloat(insumo.pacIntCOL) || 0
-            : 0;
-        return acc + precio;
+      const precio = insumo.pacIntCOL
+        ? typeof insumo.pacIntCOL === "string"
+          ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) ||
+            0
+          : parseFloat(insumo.pacIntCOL) || 0
+        : 0;
+      return acc + precio;
     }, 0);
-    
     const impuesto = totalSinImpuesto * 0.04;
     const totalConImpuesto = totalSinImpuesto + impuesto;
-
-    // ** Mostrador  totales
-    doc.setFontSize(9);
-    const yFinal = doc.lastAutoTable.finalY + 10; 
-    doc.text(`Total sin Impuesto: $${totalSinImpuesto.toFixed(2)}`, 10, yFinal);
-    doc.text(`Impuesto (4%): $${impuesto.toFixed(2)}`, 10, yFinal + 10);
-    doc.text(`Total con Impuesto: $${totalConImpuesto.toFixed(2)}`, 10, yFinal + 20);
-
-    if (yFinal + 30 > 210) {
-        doc.addPage();
-        
-        datosPaciente.forEach((line, index) => {
-            doc.text(line, 10, 10 + (index * 8));
-        });
-        
-        doc.text("Insumos Seleccionados:", 10, 40);
-        
-        autoTable(doc, {
-            head: [headers],
-            body: rows,
-            startY: 50,
-            theme: 'grid',
-            styles: {
-                fontSize: 9
-            }
-        });
-        
-        const newYFinal = doc.lastAutoTable.finalY + 10;
-        doc.text(`Total sin Impuesto: $${totalSinImpuesto.toFixed(2)}`, 10, newYFinal);
-        doc.text(`Impuesto (4%): $${impuesto.toFixed(2)}`, 10, newYFinal + 10);
-        doc.text(`Total con Impuesto: $${totalConImpuesto.toFixed(2)}`, 10, newYFinal + 20);
+    // Tabla de costos totales
+    const totals = [
+      ["Total sin Impuesto", "", `$${totalSinImpuesto.toFixed(2)}`],
+      ["Impuesto (4%)", "", `$${impuesto.toFixed(2)}`],
+      ["Total con Impuesto", "", `$${totalConImpuesto.toFixed(2)}`],
+    ];
+    autoTable(doc, {
+      head: [["Costos Totales", "", ""]],
+      body: totals,
+      startY: y,
+      theme: "striped",
+      styles: {
+        fontSize: 9,
+      },
+      columnStyles: {
+        0: { halign: "right" },
+        1: { halign: "right" },
+        2: { halign: "right" },
+      },
+    });
+    // Espacio entre tablas
+    y = doc.lastAutoTable.finalY + 5;
+    // Costos con seguro si se requiere
+    if (requiereSeguro) {
+      const totalConSeguro = totalConImpuesto * (porcentajeAPagar / 100);
+      const seguroDetails = [
+        ["Porcentaje a Pagar (%)", "", `${porcentajeAPagar}%`],
+        ["Total con Seguro", "", `$${totalConSeguro.toFixed(2)}`],
+      ];
+      autoTable(doc, {
+        head: [["Detalles del Seguro", "", ""]],
+        body: seguroDetails,
+        startY: y,
+        theme: "striped",
+        styles: {
+          fontSize: 9,
+        },
+        columnStyles: {
+          0: { halign: "right" },
+          1: { halign: "right" },
+          2: { halign: "right" },
+        },
+      });
     }
-    
-    // ** GENERA Y GUARDA EL PDF
+    // Generar y guardar el PDF
     doc.save("cotizacion.pdf");
-};
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const trimmedPatient = patient.trim();
     const trimmedDayOfBirth = dayOfBirth.trim();
     const trimmedEmail = email.trim();
@@ -194,7 +236,7 @@ export default function QuoteView({ inputs }) {
       });
       return;
     }
-    
+
     generarPDF();
   };
 
@@ -220,7 +262,7 @@ export default function QuoteView({ inputs }) {
       paginaActual - Math.floor(maxVisiblePages / 2)
     );
     const endPage = Math.min(totalPaginas, startPage + maxVisiblePages - 1);
-    
+
     for (let i = startPage; i <= endPage; i++) {
       if (i === startPage && i > 1) {
         pages.push(
