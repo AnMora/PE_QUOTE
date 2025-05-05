@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function NavLinkComponent({ dataUser }) {
+export default function NavLinkComponent({ dataUser, authUser }) {
   const data = dataUser;
   const patname = usePathname();
 
@@ -70,8 +70,8 @@ export default function NavLinkComponent({ dataUser }) {
           </div>
         </div>
         <div className="sb-sidenav-footer">
-          <div className="small">Logged in as:</div>
-          Start Bootstrap
+          <div className="small">Iniciado sesión por:</div>
+          {authUser.firstName} {authUser.lastName}
         </div>
       </nav>
     </>

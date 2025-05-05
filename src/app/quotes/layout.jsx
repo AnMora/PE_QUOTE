@@ -6,31 +6,49 @@ import NavComponent from "../components/nav";
 import NavLinkComponent from "../components/navLink";
 import Link from "next/link";
 import ErrNoAuth from "../components/401Error";
+import { getCollection } from "@/lib/db";
+import { ObjectId } from "mongodb";
 
 export default async function QuotesLayout({ children }) {
-
   const authUser = await getAuthUser();
+  const authUserId = authUser.userId;
+  const userCollection = await getCollection("users");
+
+  const user =
+    authUserId.length === 24
+      ? await userCollection?.findOne({
+          _id: ObjectId.createFromHexString(authUserId),
+        })
+      : null;
+
+  const sanitizedUser = user
+    ? {
+        ...user,
+        _id: user._id.toString(),
+        password: undefined,
+      }
+    : null;
 
   return (
     <>
       {authUser ? (
         <div className="sb-nav-fixed">
-        <NavComponent dataUser={dataUser} />
-        {/* <FooterComponent /> */}
-        <div id="layoutSidenav">
-          <div id="layoutSidenav_nav">
-            <NavLinkComponent dataUser={dataUser} />
-          </div>
-          <div id="layoutSidenav_content">
-            <main>
-              <div className="container-fluid px-2">
-                <div>{children}</div>
-              </div>
-            </main>
-            <FooterComponent dataUser={dataUser} />
+          <NavComponent dataUser={dataUser} authUser={sanitizedUser} />
+          {/* <FooterComponent /> */}
+          <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} />
+            </div>
+            <div id="layoutSidenav_content">
+              <main>
+                <div className="container-fluid px-2">
+                  <div>{children}</div>
+                </div>
+              </main>
+              <FooterComponent dataUser={dataUser} />
+            </div>
           </div>
         </div>
-      </div>
       ) : (
         <ErrNoAuth />
       )}

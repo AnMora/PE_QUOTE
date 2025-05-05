@@ -5,9 +5,14 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { logout } from "../actions/auth";
 
-export default function NavComponent({ dataUser }) {
+export default function NavComponent({ dataUser, authUser }) {
+  
+  // ** SE OBTIENEN DATOS DE USUARIO LOGEADO
+  // console.log(authUser);
+
   const data = dataUser;
   const pathname = usePathname();
+
   useEffect(() => {
     const sidebarButton = document.body.querySelector("#sidebarToggle");
     const handleSidebarToggle = (event) => {
@@ -86,7 +91,7 @@ export default function NavComponent({ dataUser }) {
               aria-labelledby="navbarDropdown"
             >
               <li>
-                <Link className="dropdown-item" href="/">
+                <Link className="dropdown-item" href={`/dashboard/${authUser._id.toString()}`}>
                   Configuracion
                 </Link>
               </li>

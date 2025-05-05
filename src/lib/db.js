@@ -33,6 +33,22 @@ export async function getCollection(collectionName) {
   return null;
 }
 
+export async function deleteOldSuggestions() {
+  const collection = await getCollection("suggestions");
+  if (!collection) {
+    console.error("No se pudo obtener la colección");
+    return;
+  }
+  // Calcula la fecha de hace 7 días
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  try {
+    const result = await collection.deleteMany({ createdAt: { $lt: sevenDaysAgo } });
+    console.log(`${result.deletedCount} sugerencias antiguas eliminadas.`);
+  } catch (error) {
+    console.error("Error al eliminar sugerencias antiguas:", error);
+  }
+}
+
 process.on("SIGINT", async () => {
   await client.close();
   console.log("MongoDB connection closed.");

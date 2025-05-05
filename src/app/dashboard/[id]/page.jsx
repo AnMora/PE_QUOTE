@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 
 export default async function DashboardUser({ params }) {
   const { id } = await params;
+
   const userCollection = await getCollection("users");
   const user =
     id.length === 24
