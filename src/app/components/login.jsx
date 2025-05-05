@@ -6,11 +6,11 @@ import { login } from "../actions/auth";
 import { useRouter } from "next/navigation"; // Importa useRouter
 export default function LoginComponent(params) {
   const [state, action, isPending] = useActionState(login, undefined);
-  const router = useRouter(); // Inicializa useRouter
-  // Efecto para manejar la redirección
+  const router = useRouter();
+  
   React.useEffect(() => {
     if (state?.redirectTo) {
-      router.push(state.redirectTo); // Realiza la redirección
+      router.push(state.redirectTo);
     }
   }, [state]);
   return (
@@ -20,7 +20,7 @@ export default function LoginComponent(params) {
           <div className="row justify-content-center">
             <div className="col-lg-6">
               <div className="card bg-dark mt-2 mb-2">
-                <div className="card-header">
+                <div className="card-header text-success">
                   <i className="fas fa-user fa-fw me-1"></i>
                   Usuario Hospital Metropolitano
                 </div>

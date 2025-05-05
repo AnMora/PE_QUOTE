@@ -1,7 +1,7 @@
 import Image from "next/image";
 import LoginComponent from "./components/login";
-import RegisterComponent from "./components/register";
 import FooterComponent from "./components/footer";
+import RegisterComponent from "./components/register";
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
         </h1>
         <p className="text-center font-weight-light my-2">
           Bienvenidos al cotizador de urgencias Pediaclinic, para poder
-          ingresar digite sus datos de trabajo
+          ingresar digite sus datos de usuario
         </p>
         <LoginComponent />
         {/* <RegisterComponent /> */}

@@ -5,8 +5,8 @@ export default function FooterComponent(params) {
         <div className="container-fluid px-4">
           <div className="d-flex align-items-center justify-content-between small">
             <div className="text-muted">
-              Copyright &copy; {new Date().getFullYear()} - All right reserved
-              by AnMora
+              Copyright &copy; {new Date().getFullYear()} - Todos los derechos reservados
+              por Angel Mora Desarrollador de sitio web
             </div>
             <div>
               <a href="#">Politicas de privacidad </a>

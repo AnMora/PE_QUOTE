@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import React, { useEffect, useState, useMemo } from "react";
 
-export default function QuoteView({ inputs }) {
+export default function QuoteView({ inputs, authUser }) {
   const [patient, setPatient] = useState("");
   const [dayOfBirth, setDayOfBirth] = useState("");
   const [email, setEmail] = useState("");
@@ -172,12 +172,12 @@ export default function QuoteView({ inputs }) {
     const totalConImpuesto = totalSinImpuesto + impuesto;
     // Tabla de costos totales
     const totals = [
-      ["Total sin Impuesto", "", `$${totalSinImpuesto.toFixed(2)}`],
-      ["Impuesto (4%)", "", `$${impuesto.toFixed(2)}`],
-      ["Total con Impuesto", "", `$${totalConImpuesto.toFixed(2)}`],
+      ["Total sin Impuesto", "", `${totalSinImpuesto.toFixed(2)}`],
+      ["Impuesto (4%)", "", `${impuesto.toFixed(2)}`],
+      ["Total con Impuesto", "", `${totalConImpuesto.toFixed(2)}`],
     ];
     autoTable(doc, {
-      head: [["Costos Totales", "", ""]],
+      head: [["Costos Totales", "", "Monto en Colones"]],
       body: totals,
       startY: y,
       theme: "striped",
@@ -214,9 +214,26 @@ export default function QuoteView({ inputs }) {
         },
       });
     }
+    
+    // Espacio antes de los datos del responsable
+    y = doc.lastAutoTable.finalY + 10;
+    // Información del responsable
+    const responsable = [
+      ["Responsable", `${authUser.firstName} ${authUser.lastName}`],
+    ];
+    // Tabla de responsable
+    autoTable(doc, {
+      head: [["Información del Responsable", ""]],
+      body: responsable,
+      startY: y,
+      theme: "striped",
+      styles: {
+        fontSize: 9,
+      },
+    });
     // Generar y guardar el PDF
-    doc.save("cotizacion.pdf");
-  };
+    doc.save(`cotizacion ${patient}.pdf`);
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();

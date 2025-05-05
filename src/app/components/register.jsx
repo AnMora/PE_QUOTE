@@ -14,9 +14,9 @@ export default function RegisterComponent(params) {
           <div className="row justify-content-center">
             <div className="col-lg-8">
               <div className="card bg-dark mt-2 mb-2">
-                <div className="card-header">
+                <div className="card-header text-success">
                   <i className="fas fa-user fa-fw me-1"></i>
-                  Usuario Hospital Metropolitano
+                  Crear usuario Hospital Metropolitano
                 </div>
                 <div className="card-body">
                   <form action={action}>
@@ -96,7 +96,7 @@ export default function RegisterComponent(params) {
                               id="emailHelp"
                               className="form-text text-warning"
                             >
-                              <p className="text-warning">Password must:</p>
+                              <p className="text-warning">La contraseña debe:</p>
                               <ul className="small text-warning">
                                 {state.errors.password.map((err) => (
                                   <li key={err}>{err}</li>
@@ -134,13 +134,12 @@ export default function RegisterComponent(params) {
                         <button
                           disabled={isPending}
                           className="btn btn-outline-primary btn-block"
-                          href="login.html"
                         >
                           {isPending ? (
                             <div className="spinner-border spinner-border-sm" role="status">
                               <span className="visually-hidden">Loading...</span>
                             </div>
-                          ) : "Create Account"}
+                          ) : "Crear cuenta"}
                         </button>
                       </div>
                     </div>

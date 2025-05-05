@@ -15,7 +15,7 @@ export default async function DashboardUser({ params }) {
   return (
     <>
       <h1 className="mt-4">
-        Dashboard {user.firstName} {user.lastName}
+        Panel Usuario {user.firstName} {user.lastName}
       </h1>
       <ol className="breadcrumb mb-4">
         <li className="breadcrumb-item active">
