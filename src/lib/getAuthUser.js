@@ -9,4 +9,6 @@ export default async function getAuthUser(params) {
     const user = await decrypt(session);
     return user;
   }
+
+  return { userId: null };
 }

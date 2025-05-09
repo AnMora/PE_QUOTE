@@ -1,13 +1,18 @@
 "use client";
 
-import { useActionState } from "react";
+import React, { useActionState } from "react";
 import { loginAdmin } from "../actions/auth";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginAdminComponent(params) {
   const [state, action, isPending] = useActionState(loginAdmin, undefined);
+  const router = useRouter();
 
-  // console.log(isPending);
+  React.useEffect(() => {
+    if (state?.redirectTo) {
+      router.push(state.redirectTo);
+    }
+  }, [state]);
 
   return (
     <div id="layoutAuthentication_content">
@@ -60,7 +65,7 @@ export default function LoginAdminComponent(params) {
                       )}
                     </div>
                     <div className="mt-4 mb-0">
-                    <div className="d-grid">
+                      <div className="d-grid">
                         <button
                           disabled={isPending}
                           className="btn btn-outline-primary"

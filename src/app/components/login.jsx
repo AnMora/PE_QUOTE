@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useActionState } from "react";
-import Link from "next/link";
 import { login } from "../actions/auth";
-import { useRouter } from "next/navigation"; // Importa useRouter
+import { useRouter } from "next/navigation";
+
 export default function LoginComponent(params) {
   const [state, action, isPending] = useActionState(login, undefined);
   const router = useRouter();

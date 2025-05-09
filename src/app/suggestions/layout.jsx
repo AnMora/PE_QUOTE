@@ -15,7 +15,7 @@ export default async function SuggestionsLayout({ children }) {
   const userCollection = await getCollection("users");
 
   const user =
-    authUserId.length === 24
+  authUserId && authUserId.length === 24
       ? await userCollection?.findOne({
           _id: ObjectId.createFromHexString(authUserId),
         })
@@ -30,13 +30,13 @@ export default async function SuggestionsLayout({ children }) {
 
   return (
     <>
-      {authUser ? (
+      {authUserId ? (
         <div className="sb-nav-fixed">
-          <NavComponent dataUser={dataUser} authUser={sanitizedUser} />
+          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={false} />
           {/* <FooterComponent /> */}
           <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} />
+              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={false} />
             </div>
             <div id="layoutSidenav_content">
               <main>

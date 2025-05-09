@@ -5,8 +5,10 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { logout } from "../actions/auth";
 
-export default function NavComponent({ dataUser, authUser }) {
+export default function NavComponent({ dataUser, authUser, isAdmin }) {
   
+  const basePath = isAdmin ? '/admin/dashboard' : '/dashboard';
+
   // ** SE OBTIENEN DATOS DE USUARIO LOGEADO
   // console.log(authUser);
 
@@ -39,7 +41,6 @@ export default function NavComponent({ dataUser, authUser }) {
     localStorage.removeItem("sb|sidebar-toggle");
   }, [pathname]);
 
-  // **AVERIGUAR CON PROYECTO PORTAFOLIO COMO CAMBIAR LOS ICONOS AL MOMENTO DE MAPEAR
   return (
     <>
       <nav
@@ -91,8 +92,8 @@ export default function NavComponent({ dataUser, authUser }) {
               aria-labelledby="navbarDropdown"
             >
               <li>
-                <Link className="dropdown-item" href={`/dashboard/${authUser._id.toString()}`}>
-                  Configuracion
+                <Link className="dropdown-item" href={`${basePath}/${authUser ? authUser._id.toString() : ''}`}>
+                  Configuración
                 </Link>
               </li>
               <li>

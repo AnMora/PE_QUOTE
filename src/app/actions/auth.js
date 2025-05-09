@@ -32,11 +32,11 @@ export async function register(state, formData) {
 
   // **CHECK IF EMAIL IS ALREADY REGISTERED
   const userCollection = await getCollection("users");
-  if (!userCollection) return { errors: { email: "Server error!" } };
+  if (!userCollection) return { errors: { email: "Error de servidor!" } };
 
   const existingUser = await userCollection.findOne({ email });
   if (existingUser)
-    return { errors: { email: "Email already exist in our database!" } };
+    return { errors: { email: "Email ya existe en base de datos!" } };
 
   // **HASH THE PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -82,11 +82,11 @@ export async function registerAdmin(state, formData) {
 
   // **CHECK IF EMAIL IS ALREADY REGISTERED
   const userCollection = await getCollection("admin");
-  if (!userCollection) return { errors: { email: "Server error!" } };
+  if (!userCollection) return { errors: { email: "Error de servidor!" } };
 
   const existingUser = await userCollection.findOne({ email });
   if (existingUser)
-    return { errors: { email: "Email already exist in our database!" } };
+    return { errors: { email: "Email ya existe en base de datos!" } };
 
   // **HASH THE PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -104,7 +104,7 @@ export async function registerAdmin(state, formData) {
   await createSession(results.insertedId.toString());
 
   // **REDIRECT
-  redirect("/dashboard");
+  redirect("/admin/dashboard");
 }
 
 export async function login(state, formData) {
@@ -125,37 +125,41 @@ export async function login(state, formData) {
   const { email, password } = validatedFields.data;
 
   const userCollection = await getCollection("users");
-  if (!userCollection) return { errors: { email: "Server error!" } };
+  if (!userCollection) return { errors: { email: "Error de servidor!" } };
 
   try {
     const existingUser = await userCollection.findOne({ email });
     if (!existingUser) {
-      return { errors: { email: "Invalid Credentials!" } };
+      return { errors: { email: "Credenciales invalidos!" } };
     }
     const matchedPassword = await bcrypt.compare(
       password,
       existingUser.password
     );
     if (!matchedPassword) {
-      return { errors: { password: "Invalid password!" } };
+      return { errors: { password: "Contraseña invalida!" } };
     }
     await createSession(existingUser._id.toString());
     // console.log(existingUser);
     return { redirectTo: `/dashboard/${existingUser._id.toString()}` };
   } catch (error) {
-    console.error("Error during login process:", error);
-    return { errors: { email: "An error occurred. Please try again later." } };
+    console.error("Error durante el proceso de inicio de sesión: ", error);
+    return {
+      errors: {
+        email: "Se ha producido un error. Inténtelo de nuevo más tarde.",
+      },
+    };
   }
 }
 
 export async function loginAdmin(state, formData) {
+  // ** CHECK THE INPUTS FORM FIELDS
   const validatedFields = LoginFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  console.log(validatedFields);
-
+  // ** VALIDATE FORM FIELDS
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
@@ -163,10 +167,34 @@ export async function loginAdmin(state, formData) {
     };
   }
 
-  const userCollection = "hola";
+  const { email, password } = validatedFields.data;
 
-  console.log(email);
-  console.log(password);
+  const userCollection = await getCollection("admin");
+  if (!userCollection) return { errors: { email: "Error de servidor!" } };
+
+  try {
+    const existingAdmin = await userCollection.findOne({ email });
+    if (!existingAdmin) {
+      return { errors: { email: "Credenciales invalidos!" } };
+    }
+    const matchedPassword = await bcrypt.compare(
+      password,
+      existingAdmin.password
+    );
+    if (!matchedPassword) {
+      return { errors: { password: "Contraseña invalida!" } };
+    }
+    await createSession(existingAdmin._id.toString());
+    // console.log(existingAdmin);
+    return { redirectTo: `/admin/dashboard/${existingAdmin._id.toString()}` };
+  } catch (error) {
+    console.error("Error durante el proceso de inicio de sesión: ", error);
+    return {
+      errors: {
+        email: "Se ha producido un error. Inténtelo de nuevo más tarde.",
+      },
+    };
+  }
 }
 
 export async function logout(params) {

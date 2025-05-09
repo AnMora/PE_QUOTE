@@ -2,7 +2,6 @@
 
 import { useActionState } from "react";
 import { registerAdmin } from "../actions/auth";
-import Link from "next/link";
 
 export default function RegisterAdminComponent(params) {
   const [state, action, isPending] = useActionState(registerAdmin, undefined);

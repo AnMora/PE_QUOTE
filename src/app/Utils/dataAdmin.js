@@ -1,27 +1,47 @@
 const CUPPanelAdmin = {
-    estasEn: "Panel Admin",
-    paginas: [
-        {
-            path: "/cotizador",
-            seccion: "Cotizador Urgencias Pediatricas"
-        },
-        {
-            path: "/sugerencias",
-            seccion: "Sugerencias"
-        },
-        {
-            path: "/informes",
-            seccion: "Informes"
-        },
-        {
-            path: "/proformas",
-            seccion: "Proformas"
-        },
-        {
-            path: "/convenios",
-            seccion: "Convenios"
-        },
+    pageDashboard: [
+      {
+        path: "/admin/dashboard",
+        session: "Dashboard",
+        icon: "fas fa-tachometer-alt"
+      },
     ],
-}
-
-export default CUPPanelAdmin;
+    pageInterface: [
+      {
+        path: "/admin/register",
+        session: "Register",
+        icon: "fas fa-book-open"
+      },
+    ],
+    register: [
+      {
+        path: "/admin/register",
+        session: "Register Admin",
+        icon: "fas fa-book-open"
+      },
+      {
+        path: "/admin/register",
+        session: "Register User",
+        icon: "fas fa-book-open"
+      },
+    ],
+    pageAddons: [
+      {
+        path: "/admin/proformas",
+        session: "Proformas",
+        icon: "fas fa-columns"
+      },
+      {
+        path: "/admin/convenios",
+        session: "Convenios",
+        icon: "fas fa-table"
+      },
+    ],
+    generalInformation: {
+      websiteName: "Cotizador PE",
+      description: "Cotizador de pediatria - emergencias",
+      medicalCenter: "Hospital Metropolitano",
+    },
+  };
+  
+  export default CUPPanelAdmin;

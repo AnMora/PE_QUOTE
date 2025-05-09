@@ -1,12 +1,12 @@
 import { getCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export default async function DashboardUser({ params }) {
+export default async function DashboardAdmin({ params }) {
   const { id } = await params;
-  const userCollection = await getCollection("users");
-  const user =
+  const adminCollection = await getCollection("admin");
+  const admin =
     id.length === 24
-      ? await userCollection?.findOne({
+      ? await adminCollection?.findOne({
           _id: ObjectId.createFromHexString(id),
         })
       : null;
@@ -14,11 +14,11 @@ export default async function DashboardUser({ params }) {
   return (
     <>
       <h1 className="mt-4">
-        Panel Usuario {user.firstName} {user.lastName}
+        Panel Admin {admin.firstName} {admin.lastName}
       </h1>
       <ol className="breadcrumb mb-4">
         <li className="breadcrumb-item active">
-          Informacion general: acerca de panel de usuario
+          Informacion general: guia de links - instrucciones - acerca de - ..
         </li>
       </ol>
     </>
