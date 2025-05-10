@@ -9,19 +9,12 @@ const CUPPanelAdmin = {
     pageInterface: [
       {
         path: "/admin/register",
-        session: "Register",
-        icon: "fas fa-book-open"
-      },
-    ],
-    register: [
-      {
-        path: "/admin/register",
-        session: "Register Admin",
+        session: "Registrar Admin",
         icon: "fas fa-book-open"
       },
       {
         path: "/admin/register",
-        session: "Register User",
+        session: "Registrar Usuario",
         icon: "fas fa-book-open"
       },
     ],
