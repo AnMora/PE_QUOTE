@@ -19,12 +19,12 @@ export default function NavLinkComponent({ dataUser, authUser, isAdmin }) {
   });
 
   // **OPCIONES PARA NAV ADMIN
-  const PageInterfaceRegister = data.pageInterface.map((item, position) => {
+  const PageInterfaceAdmin = data.pageInterface.map((item, position) => {
     return (
       <div key={position}>
-        <a className="nav-link" href={item.path}>
+        <Link className="nav-link" href={item.path}>
           {item.session}
-        </a>
+        </Link>
       </div>
     );
   });
@@ -96,7 +96,7 @@ export default function NavLinkComponent({ dataUser, authUser, isAdmin }) {
                 data-bs-parent="#sidenavAccordion"
               >
                 <nav className="sb-sidenav-menu-nested nav">
-                  {PageInterfaceRegister}
+                  {PageInterfaceAdmin}
                 </nav>
               </div>
 

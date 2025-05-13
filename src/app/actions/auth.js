@@ -51,10 +51,10 @@ export async function register(state, formData) {
   });
 
   // **CREATE A SESSION
-  await createSession(results.insertedId.toString());
+  // await createSession(results.insertedId.toString());
 
   // **REDIRECT
-  redirect("/dashboard");
+  redirect("/admin/dashboard");
 }
 
 export async function registerAdmin(state, formData) {
@@ -101,7 +101,7 @@ export async function registerAdmin(state, formData) {
   });
 
   // **CREATE A SESSION
-  await createSession(results.insertedId.toString());
+  // await createSession(results.insertedId.toString());
 
   // **REDIRECT
   redirect("/admin/dashboard");
