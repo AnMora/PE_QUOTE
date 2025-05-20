@@ -52,11 +52,11 @@ export default function QuoteView({ inputs, authUser }) {
         ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
         : parseFloat(insumo.pacIntCOL) || 0
       : 0;
-    return acc + precio;
+    return acc + precio * (insumo.cantidad || 1); // Multiplicar por la cantidad
   }, 0);
 
   if (typeof totalSinImpuesto !== "number" || isNaN(totalSinImpuesto)) {
-    console.error("totalSinImpuesto no es un número:", totalSinImpuesto);
+    console.error("TotalSinImpuesto no es un número: ", totalSinImpuesto);
     totalSinImpuesto = 0;
   }
 
@@ -73,6 +73,14 @@ export default function QuoteView({ inputs, authUser }) {
         : totalConImpuesto,
     [requiereSeguro, totalConImpuesto, porcentajeAPagar]
   );
+
+  const totalConSeguroSinImpuesto = useMemo(
+    () =>
+      requiereSeguro
+        ? totalSinImpuesto * (porcentajeAPagar / 100)
+        : totalSinImpuesto,
+    [requiereSeguro, totalSinImpuesto, porcentajeAPagar]
+  );
   useEffect(() => {
     const storedInsumos = localStorage.getItem("insumosSeleccionados");
     if (storedInsumos) {
@@ -85,7 +93,8 @@ export default function QuoteView({ inputs, authUser }) {
   }, [seleccionados]);
 
   const agregarInsumo = (insumo) => {
-    setSeleccionados((prev) => [...prev, insumo]);
+    const insumoConCantidad = { ...insumo, cantidad: 1 }; // Establecer cantidad por defecto en 1
+    setSeleccionados((prev) => [...prev, insumoConCantidad]);
   };
   const eliminarInsumo = (index) => {
     setSeleccionados((prev) => prev.filter((_, i) => i !== index));
@@ -134,11 +143,13 @@ export default function QuoteView({ inputs, authUser }) {
     const headers = [
       "Nombre del Artículo",
       "Descripción del Artículo",
+      "Cantidad",
       "Costo del Artículo",
     ];
     const rows = seleccionados.map((insumo) => [
       insumo.numeroDelArticulo,
       insumo.descripcionDelArticulo,
+      insumo.cantidad,
       insumo.pacIntCOL,
     ]);
     // Tabla de insumos
@@ -153,28 +164,29 @@ export default function QuoteView({ inputs, authUser }) {
       columnStyles: {
         0: { halign: "left" },
         1: { halign: "left" },
-        2: { halign: "right" },
+        2: { halign: "left" },
+        3: { halign: "right" },
       },
     });
     // Espacio entre tablas
     y = doc.lastAutoTable.finalY + 5;
     // Cálculo de totales
-    const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
-      const precio = insumo.pacIntCOL
-        ? typeof insumo.pacIntCOL === "string"
-          ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) ||
-            0
-          : parseFloat(insumo.pacIntCOL) || 0
-        : 0;
-      return acc + precio;
-    }, 0);
-    const impuesto = totalSinImpuesto * 0.04;
-    const totalConImpuesto = totalSinImpuesto + impuesto;
+    // const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
+    //   const precio = insumo.pacIntCOL
+    //     ? typeof insumo.pacIntCOL === "string"
+    //       ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) ||
+    //         0
+    //       : parseFloat(insumo.pacIntCOL) || 0
+    //     : 0;
+    //   return acc + precio;
+    // }, 0);
+    // const impuesto = totalSinImpuesto * 0.04;
+    // const totalConImpuesto = totalSinImpuesto + impuesto;
     // Tabla de costos totales
     const totals = [
-      ["Total sin Impuesto", "", `${totalSinImpuesto.toFixed(2)}`],
-      ["Impuesto (4%)", "", `${impuesto.toFixed(2)}`],
       ["Total con Impuesto", "", `${totalConImpuesto.toFixed(2)}`],
+      ["Impuesto (4%)", "", `${impuesto.toFixed(2)}`],
+      ["Total sin Impuesto", "", `${totalSinImpuesto.toFixed(2)}`],
     ];
     autoTable(doc, {
       head: [["Costos Totales", "", "Monto en Colones"]],
@@ -194,13 +206,15 @@ export default function QuoteView({ inputs, authUser }) {
     y = doc.lastAutoTable.finalY + 5;
     // Costos con seguro si se requiere
     if (requiereSeguro) {
-      const totalConSeguro = totalConImpuesto * (porcentajeAPagar / 100);
+      // const totalConSeguro = totalConImpuesto * (porcentajeAPagar / 100);
+      // const totalConSeguroSinImpuesto = totalSinImpuesto * (porcentajeAPagar / 100);
       const seguroDetails = [
         ["Porcentaje a Pagar (%)", "", `${porcentajeAPagar}%`],
-        ["Total con Seguro", "", `$${totalConSeguro.toFixed(2)}`],
+        ["Total Seguro Con impuesto", "", `${totalConSeguro.toFixed(2)}`],
+        ["Total Seguro Sin impuesto", "", `${totalConSeguroSinImpuesto.toFixed(2)}`],
       ];
       autoTable(doc, {
-        head: [["Detalles del Seguro", "", ""]],
+        head: [["Detalles del Seguro", "", "Monto en Colones"]],
         body: seguroDetails,
         startY: y,
         theme: "striped",
@@ -214,7 +228,7 @@ export default function QuoteView({ inputs, authUser }) {
         },
       });
     }
-    
+
     // Espacio antes de los datos del responsable
     y = doc.lastAutoTable.finalY + 10;
     // Información del responsable
@@ -233,7 +247,7 @@ export default function QuoteView({ inputs, authUser }) {
     });
     // Generar y guardar el PDF
     doc.save(`cotizacion ${patient}.pdf`);
-};
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -328,7 +342,7 @@ export default function QuoteView({ inputs, authUser }) {
             <div className="col-md-6">
               <div className="form-floating mb-3 mb-md-0">
                 <input
-                  className="form-control"
+                  className="form-control bg-dark text-info border-info"
                   id="inputFirstName"
                   type="text"
                   name="patient"
@@ -341,7 +355,7 @@ export default function QuoteView({ inputs, authUser }) {
             <div className="col-md-6">
               <div className="form-floating">
                 <input
-                  className="form-control"
+                  className="form-control bg-dark text-info border-info"
                   id="inputLastName"
                   type="text"
                   name="dayOfBirth"
@@ -356,7 +370,7 @@ export default function QuoteView({ inputs, authUser }) {
             <div className="col-md-6">
               <div className="form-floating mb-3 mb-md-0">
                 <input
-                  className="form-control"
+                  className="form-control bg-dark text-info border-info"
                   id="inputFirstName"
                   type="text"
                   name="emailAddress"
@@ -369,7 +383,7 @@ export default function QuoteView({ inputs, authUser }) {
             <div className="col-md-6">
               <div className="form-floating">
                 <input
-                  className="form-control"
+                  className="form-control bg-dark text-info border-info"
                   id="inputLastName"
                   type="text"
                   name="patientDiagnostic"
@@ -382,6 +396,7 @@ export default function QuoteView({ inputs, authUser }) {
           </div>
         </div>
       </div>
+
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
@@ -393,7 +408,7 @@ export default function QuoteView({ inputs, authUser }) {
             <div className="input-group">
               <input
                 type="text"
-                className="form-control"
+                className="form-control bg-dark text-info border-info"
                 id="buscador"
                 placeholder="Buscar insumos..."
                 value={terminoBusqueda}
@@ -411,7 +426,7 @@ export default function QuoteView({ inputs, authUser }) {
           <table className="table table-hover table-bordered">
             <thead>
               <tr className="table-dark">
-                <th scope="col">Nombre del Artículo</th>
+                <th scope="col">Numero del Artículo</th>
                 <th scope="col">Descripción del Artículo</th>
                 <th scope="col">Precio Ext (COL)</th>
                 <th scope="col">Precio Int (COL)</th>
@@ -420,7 +435,7 @@ export default function QuoteView({ inputs, authUser }) {
             </thead>
             <tfoot>
               <tr className="table-dark">
-                <th scope="col">Nombre del Artículo</th>
+                <th scope="col">Numero del Artículo</th>
                 <th scope="col">Descripción del Artículo</th>
                 <th scope="col">Precio Ext (COL)</th>
                 <th scope="col">Precio Int (COL)</th>
@@ -490,6 +505,7 @@ export default function QuoteView({ inputs, authUser }) {
           </div>
         </div>
       </div>
+
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
@@ -501,9 +517,10 @@ export default function QuoteView({ inputs, authUser }) {
               <table className="table table-hover table-bordered">
                 <thead>
                   <tr className="table-dark">
-                    <th scope="col">Nombre del Artículo</th>
+                    <th scope="col">Numero del Artículo</th>
                     <th scope="col">Descripción del Artículo</th>
                     <th scope="col">Precio Int (COL)</th>
+                    <th scope="col">Cantidad</th>
                     <th scope="col">Acciones</th>
                   </tr>
                 </thead>
@@ -512,31 +529,31 @@ export default function QuoteView({ inputs, authUser }) {
                     <th colSpan="2" className="text-end">
                       Costos Totales
                     </th>
-                    <th colSpan="2" className="text-end">
+                    <th colSpan="3" className="text-end">
                       Montos Totales
                     </th>
                   </tr>
                   <tr className="table-dark">
                     <td colSpan="2" className="text-end">
-                      Total sin Impuesto:
+                      Total con Impuesto (4%):
                     </td>
-                    <td colSpan="2" className="text-end text-warning">
-                      {totalSinImpuesto.toFixed(2)}
+                    <td colSpan="3" className="text-end text-warning">
+                      {totalConImpuesto.toFixed(2)}
                     </td>
                   </tr>
                   <tr className="table-dark">
                     <td colSpan="2" className="text-end">
-                      Total con Impuesto (4%):
+                      Total sin Impuesto:
                     </td>
-                    <td colSpan="2" className="text-end text-warning">
-                      {totalConImpuesto.toFixed(2)}
+                    <td colSpan="3" className="text-end text-warning">
+                      {totalSinImpuesto.toFixed(2)}
                     </td>
                   </tr>
                   <tr className="table-dark">
                     <td colSpan="2" className="text-end">
                       Requiere seguro
                     </td>
-                    <td colSpan="2" className="text-end text-warning">
+                    <td colSpan="3" className="text-end text-warning">
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -551,9 +568,9 @@ export default function QuoteView({ inputs, authUser }) {
                         <td colSpan="2" className="text-end">
                           Porcentaje a Pagar (%):
                         </td>
-                        <td colSpan="2">
+                        <td colSpan="3">
                           <input
-                            className="form-control text-end"
+                            className="form-control bg-dark text-info border-info text-end"
                             type="text"
                             id="porcentajeAPagar"
                             value={porcentajeAPagar}
@@ -567,10 +584,18 @@ export default function QuoteView({ inputs, authUser }) {
                       </tr>
                       <tr className="table-dark">
                         <td colSpan="2" className="text-end">
-                          Total con Seguro:
+                          Total Seguro con Impuesto:
                         </td>
-                        <td colSpan="2" className="text-end text-warning">
+                        <td colSpan="3" className="text-end text-warning">
                           {totalConSeguro.toFixed(2)}
+                        </td>
+                      </tr>
+                      <tr className="table-dark">
+                        <td colSpan="2" className="text-end">
+                          Total Seguro sin Impuesto:
+                        </td>
+                        <td colSpan="3" className="text-end text-warning">
+                          {totalConSeguroSinImpuesto.toFixed(2)}
                         </td>
                       </tr>
                     </>
@@ -582,6 +607,26 @@ export default function QuoteView({ inputs, authUser }) {
                       <td>{insumo.numeroDelArticulo}</td>
                       <td>{insumo.descripcionDelArticulo}</td>
                       <td className="text-warning">{insumo.pacIntCOL}</td>
+                      <td>
+                        <input
+                          className="bg-dark text-info border-info"
+                          type="number"
+                          value={insumo.cantidad || 1} // Usar la cantidad del insumo
+                          min={1}
+                          onChange={(e) => {
+                            const nuevaCantidad = parseInt(e.target.value) || 1;
+                            setSeleccionados((prev) => {
+                              const nuevosInsumos = [...prev];
+                              nuevosInsumos[index] = {
+                                ...insumo,
+                                cantidad: nuevaCantidad,
+                              };
+                              return nuevosInsumos;
+                            });
+                          }}
+                          style={{ width: "60px" }}
+                        />
+                      </td>
                       <td>
                         <button
                           type="button"

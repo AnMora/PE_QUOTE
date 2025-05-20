@@ -42,13 +42,14 @@ export async function register(state, formData) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   //** SAVE IN DN
-  const results = await userCollection.insertOne({
+  // const results = await userCollection.insertOne({
+  await userCollection.insertOne({
     firstName,
     lastName,
     email,
     password: hashedPassword,
     range: "user",
-  });
+  }); 
 
   // **CREATE A SESSION
   // await createSession(results.insertedId.toString());
@@ -92,7 +93,8 @@ export async function registerAdmin(state, formData) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   //** SAVE IN DN
-  const results = await userCollection.insertOne({
+  // const results = await userCollection.insertOne({
+  await userCollection.insertOne({
     firstName,
     lastName,
     email,

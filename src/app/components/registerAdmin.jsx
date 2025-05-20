@@ -72,7 +72,7 @@ export default function RegisterAdminComponent(params) {
                         placeholder="name@example.com"
                         defaultValue={state?.email}
                       />
-                      <label htmlFor="inputEmail">Correo Electrónic</label>
+                      <label htmlFor="inputEmail">Correo Electrónico</label>
                       {state?.errors?.email && (
                         <small id="emailHelp" className="form-text text-warning">
                           {state.errors.email}

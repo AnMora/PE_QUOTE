@@ -9,14 +9,27 @@ const CUPPanelAdmin = {
   pageInterface: [
     {
       path: "/admin/register/register-admin",
-      session: "Registrar Admin",
-      icon: "fas fa-book-open",
+      session: "Administradores",
+      icon: "fas fa-table",
     },
     {
       path: "/admin/register/register-user",
-      session: "Registrar Usuario",
-      icon: "fas fa-book-open",
+      session: "Empleados",
+      icon: "fas fa-table",
     },
+  ],
+  // VERIFICAR SI HACEMOS LOS LISTADOS EN PAGINAS INDEPENDIENTES O BIEN EN UNO SOLO
+  pageList: [
+    {
+      path: "/admin/list/list-admin",
+      session: "Lista de usuarios",
+      icon: "fas fa-tachometer-alt",
+    },
+    {
+      path: "/admin/list/list-users",
+      session: "Lista de usuarios",
+      icon: "fas fa-tachometer-alt",
+    }
   ],
   pageAddons: [
     {
@@ -27,7 +40,7 @@ const CUPPanelAdmin = {
     {
       path: "/admin/convenios",
       session: "Convenios",
-      icon: "fas fa-table",
+      icon: "fas fa-book-open",
     },
   ],
   generalInformation: {

@@ -82,9 +82,9 @@ export default function NavLinkComponent({ dataUser, authUser, isAdmin }) {
                 aria-controls="collapseLayouts"
               >
                 <div className="sb-nav-link-icon">
-                  <i className="fas fa-columns"></i>
+                  <i className="fas fa-book-open"></i>
                 </div>
-                Registrar
+                Listado de usuarios
                 <div className="sb-sidenav-collapse-arrow">
                   <i className="fas fa-angle-down"></i>
                 </div>
