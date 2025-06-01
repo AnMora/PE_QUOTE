@@ -22,6 +22,20 @@ export default function QuoteView({ inputs, authUser }) {
   const totalPaginas = Math.ceil(inputs.length / insumosPorPagina);
 
   useEffect(() => {
+    if (!authUser) {
+      // Limpiar los insumos seleccionados y otros estados relevantes al cerrar sesión
+      setSeleccionados([]);
+      setPatient("");
+      setDayOfBirth("");
+      setEmail("");
+      setDiagnostic("");
+      setTerminoBusqueda("");
+      setPaginaActual(1); // Opcional: restablecer la página a 1
+      localStorage.removeItem("insumosSeleccionados"); // Limpiar localStorage
+    }
+  }, [authUser]);
+
+  useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
     };
@@ -44,6 +58,7 @@ export default function QuoteView({ inputs, authUser }) {
       );
     });
     setInsumosFiltrados(filteredInsumos);
+    setPaginaActual(1); // Restablecer a la primera página al buscar
   }, [terminoBusqueda, inputs]);
 
   const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
@@ -95,6 +110,7 @@ export default function QuoteView({ inputs, authUser }) {
   const agregarInsumo = (insumo) => {
     const insumoConCantidad = { ...insumo, cantidad: 1 }; // Establecer cantidad por defecto en 1
     setSeleccionados((prev) => [...prev, insumoConCantidad]);
+    setPaginaActual(1); // Restablecer a la primera página al agregar un insumo
   };
   const eliminarInsumo = (index) => {
     setSeleccionados((prev) => prev.filter((_, i) => i !== index));
@@ -211,7 +227,11 @@ export default function QuoteView({ inputs, authUser }) {
       const seguroDetails = [
         ["Porcentaje a Pagar (%)", "", `${porcentajeAPagar}%`],
         ["Total Seguro Con impuesto", "", `${totalConSeguro.toFixed(2)}`],
-        ["Total Seguro Sin impuesto", "", `${totalConSeguroSinImpuesto.toFixed(2)}`],
+        [
+          "Total Seguro Sin impuesto",
+          "",
+          `${totalConSeguroSinImpuesto.toFixed(2)}`,
+        ],
       ];
       autoTable(doc, {
         head: [["Detalles del Seguro", "", "Monto en Colones"]],
