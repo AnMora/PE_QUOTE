@@ -16,7 +16,7 @@ export default function RegisterComponent(params) {
               <div className="card bg-dark mt-2 mb-2">
                 <div className="card-header text-success">
                   <i className="fas fa-user fa-fw me-1"></i>
-                  Crear usuario Hospital Metropolitano
+                  Crear empleado Hospital Metropolitano
                 </div>
                 <div className="card-body">
                   <form action={action}>

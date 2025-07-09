@@ -27,7 +27,7 @@ export default function LoginAdminComponent(params) {
                 </div>
                 <div className="card-body">
                   <form action={action}>
-                    <div className="form-floating mb-3">
+                    <div className="form-floating mb-2">
                       <input
                         className="form-control"
                         id="inputEmail"
@@ -46,7 +46,7 @@ export default function LoginAdminComponent(params) {
                         </small>
                       )}
                     </div>
-                    <div className="form-floating mb-3">
+                    <div className="form-floating mb-2">
                       <input
                         className="form-control"
                         id="inputPassword"
@@ -64,7 +64,7 @@ export default function LoginAdminComponent(params) {
                         </small>
                       )}
                     </div>
-                    <div className="mt-4 mb-0">
+                    <div className="mt-2">
                       <div className="d-grid">
                         <button
                           disabled={isPending}

@@ -3,10 +3,10 @@ import QuoteView from "@/app/components/quoteView";
 import { getCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export default async function Quotes(params) {
+export default async function QuotesNurse(params) {
   const authUser = await getAuthUser();
   const authUserId = authUser.userId;
-  const userCollection = await getCollection("users");
+  const userCollection = await getCollection("nurse");
   
     const user =
       authUserId.length === 24
@@ -43,7 +43,7 @@ export default async function Quotes(params) {
       <div id="layoutAuthentication_content">
         <main>
           <div className="container-fluid px-2">
-            <QuoteView inputs={simpleInputs} authUser={sanitizedUser} isNurse={false} />
+            <QuoteView inputs={simpleInputs} authUser={sanitizedUser} isNurse={true} />
           </div>
         </main>
       </div>

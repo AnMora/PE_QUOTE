@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-export const RegisterFormSchema = z
-  .object({
+export const RegisterFormSchema = z.object({
     firstName: z
       .string()
       .min(3, { message: "El nombre de usuario es requerido" })

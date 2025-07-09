@@ -1,19 +1,19 @@
-const CUPPanelUser = {
+const CUPPanelNurse = {
   pageDashboard: [
     {
-      path: "/dashboard",
+      path: "/nurse/dashboard",
       session: "Dashboard",
       icon: "fas fa-tachometer-alt"
     },
   ],
   pageInterface: [
     {
-      path: "/quotes",
+      path: "/nurse/quotes",
       session: "Cotizador",
       icon: "fas fa-table"
     },
     {
-      path: "/suggestions",
+      path: "/nurse/suggestions",
       session: "Sugerencias",
       icon: "fas fa-book-open"
     },
@@ -22,7 +22,7 @@ const CUPPanelUser = {
     {
       path: "/admin/assents",
       session: "Consentimientos",
-      icon: "fas fa-chart-area",
+      icon: "fas fa-book-open",
     },
     {
       path: "/admin/formal",
@@ -37,4 +37,4 @@ const CUPPanelUser = {
   },
 };
 
-export default CUPPanelUser;
+export default CUPPanelNurse;

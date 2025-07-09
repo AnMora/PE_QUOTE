@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 
-export default function NavLinkComponent({ dataUser, authUser, isAdmin }) {
-  const data = dataUser;
+export default function NavLinkComponent({ dataUser, authUser, isNurse, isAdmin }) {
+  const data = dataUser; 
 
   const PageDashboard = data.pageDashboard.map((item, position) => {
     return (
@@ -198,6 +198,28 @@ export default function NavLinkComponent({ dataUser, authUser, isAdmin }) {
           <div className="sb-sidenav-footer">
             <div className="small">Iniciado sesión por:</div>
             <span>Admin {authUser.firstName}</span>
+          </div>
+        </nav>
+      ) : isNurse ? (
+         <nav
+          className="sb-sidenav accordion sb-sidenav-dark"
+          id="sidenavAccordion"
+        >
+          <div className="sb-sidenav-menu">
+            <div className="nav">
+              <div className="sb-sidenav-menu-heading">Panel Principal</div>
+              {PageDashboard}
+              <div className="sb-sidenav-menu-heading">Interfaces</div>
+              {PageInterface}
+              <div className="sb-sidenav-menu-heading">Complementos</div>
+              {PageAddons}
+            </div>
+          </div>
+          <div className="sb-sidenav-footer">
+            <div className="small">Iniciado sesión por:</div>
+            <span>
+              {authUser.firstName} {authUser.lastName}
+            </span>
           </div>
         </nav>
       ) : (

@@ -33,11 +33,11 @@ export default async function QuotesLayout({ children }) {
     <>
       {authUserId ? (
         <div className="sb-nav-fixed">
-          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={false} />
+          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isNurse={true} isAdmin={false}/>
           {/* <FooterComponent /> */}
           <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={false} />
+              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isNurse={true} isAdmin={false} />
             </div>
             <div id="layoutSidenav_content">
               <main>

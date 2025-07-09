@@ -1,16 +1,13 @@
-import { editPost } from "@/app/actions/posts";
+import { editNursePost } from "@/app/actions/posts";
 import SuggestionFormComponent from "@/app/components/SuggestionForm";
 import { getCollection } from "@/lib/db";
 import getAuthUser from "@/lib/getAuthUser";
 import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 
-export default async function editSuggestion({ params }) {
-    // ** ID PARAMETER FROM PAGE PARAMS
+export default async function editNurseSuggestion({ params }) {
   const { id } = await params;
-
-    // ** GET AUTH USER FROM COOKIES
-    const user = await getAuthUser()
+  const user = await getAuthUser()
 
   const suggestionCollection = await getCollection("suggestions");
   let suggestion;
@@ -20,7 +17,7 @@ export default async function editSuggestion({ params }) {
     });
     suggestion = JSON.parse(JSON.stringify(suggestion));
     if (user.userId !== suggestion.userId) {
-        redirect("/suggestions")
+        redirect("/nurse/suggestions")
     }
   } else {
     suggestion = null;
@@ -38,7 +35,7 @@ export default async function editSuggestion({ params }) {
                 </h3>
               </div>
               {suggestion ? (
-                <SuggestionFormComponent handler={editPost} suggestion={suggestion} isNurse={false} />
+                <SuggestionFormComponent handler={editNursePost} suggestion={suggestion} isNurse={true} />
               ) : (
                 <p>Failed to fetch the data</p>
               )}

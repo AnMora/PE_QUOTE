@@ -2,7 +2,7 @@ import ShowSuggestion from "@/app/components/showSuggestion";
 import { getCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export default async function showSuggestion({ params }) {
+export default async function showNurseSuggestion({ params }) {
   const { id } = await params;
 
   const suggestionCollection = await getCollection("suggestions");
@@ -16,7 +16,7 @@ export default async function showSuggestion({ params }) {
   return (
     <>
       {suggestion ? (
-        <ShowSuggestion suggestion={suggestion} isNurse={false} />
+        <ShowSuggestion suggestion={suggestion} isNurse={true} />
       ) : (
         <p>Failed to fetch the data</p>
       )}

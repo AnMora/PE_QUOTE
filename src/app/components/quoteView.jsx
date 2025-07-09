@@ -1,16 +1,13 @@
 "use client";
-
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import React, { useEffect, useState, useMemo } from "react";
-
-export default function QuoteView({ inputs, authUser }) {
+export default function QuoteView({ inputs, authUser, isNurse }) {
   const [patient, setPatient] = useState("");
   const [dayOfBirth, setDayOfBirth] = useState("");
   const [email, setEmail] = useState("");
   const [diagnostic, setDiagnostic] = useState("");
   const [formErrors, setFormErrors] = useState({});
-
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [insumosFiltrados, setInsumosFiltrados] = useState(inputs);
   const [seleccionados, setSeleccionados] = useState([]);
@@ -22,20 +19,6 @@ export default function QuoteView({ inputs, authUser }) {
   const totalPaginas = Math.ceil(inputs.length / insumosPorPagina);
 
   useEffect(() => {
-    if (!authUser) {
-      // Limpiar los insumos seleccionados y otros estados relevantes al cerrar sesión
-      setSeleccionados([]);
-      setPatient("");
-      setDayOfBirth("");
-      setEmail("");
-      setDiagnostic("");
-      setTerminoBusqueda("");
-      setPaginaActual(1); // Opcional: restablecer la página a 1
-      localStorage.removeItem("insumosSeleccionados"); // Limpiar localStorage
-    }
-  }, [authUser]);
-
-  useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
     };
@@ -45,13 +28,10 @@ export default function QuoteView({ inputs, authUser }) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   useEffect(() => {
     const filteredInsumos = inputs.filter((insumo) => {
-      const numeroDelArticulo =
-        insumo.numeroDelArticulo?.toLowerCase().trim() || "";
-      const descripcionDelArticulo =
-        insumo.descripcionDelArticulo?.toLowerCase().trim() || "";
+      const numeroDelArticulo = insumo.numeroDelArticulo?.toLowerCase().trim() || "";
+      const descripcionDelArticulo = insumo.descripcionDelArticulo?.toLowerCase().trim() || "";
       return (
         numeroDelArticulo.includes(terminoBusqueda.toLowerCase().trim()) ||
         descripcionDelArticulo.includes(terminoBusqueda.toLowerCase().trim())
@@ -60,76 +40,33 @@ export default function QuoteView({ inputs, authUser }) {
     setInsumosFiltrados(filteredInsumos);
     setPaginaActual(1); // Restablecer a la primera página al buscar
   }, [terminoBusqueda, inputs]);
-
-  const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
-    const precio = insumo.pacIntCOL
-      ? typeof insumo.pacIntCOL === "string"
-        ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
-        : parseFloat(insumo.pacIntCOL) || 0
-      : 0;
-    return acc + precio * (insumo.cantidad || 1); // Multiplicar por la cantidad
-  }, 0);
-
-  if (typeof totalSinImpuesto !== "number" || isNaN(totalSinImpuesto)) {
-    console.error("TotalSinImpuesto no es un número: ", totalSinImpuesto);
-    totalSinImpuesto = 0;
-  }
-
-  const impuesto = useMemo(() => totalSinImpuesto * 0.04, [totalSinImpuesto]);
-
-  const totalConImpuesto = useMemo(
-    () => totalSinImpuesto + impuesto,
-    [totalSinImpuesto, impuesto]
-  );
-  const totalConSeguro = useMemo(
-    () =>
-      requiereSeguro
-        ? totalConImpuesto * (porcentajeAPagar / 100)
-        : totalConImpuesto,
-    [requiereSeguro, totalConImpuesto, porcentajeAPagar]
-  );
-
-  const totalConSeguroSinImpuesto = useMemo(
-    () =>
-      requiereSeguro
-        ? totalSinImpuesto * (porcentajeAPagar / 100)
-        : totalSinImpuesto,
-    [requiereSeguro, totalSinImpuesto, porcentajeAPagar]
-  );
-  useEffect(() => {
-    const storedInsumos = localStorage.getItem("insumosSeleccionados");
-    if (storedInsumos) {
-      setSeleccionados(JSON.parse(storedInsumos));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("insumosSeleccionados", JSON.stringify(seleccionados));
-  }, [seleccionados]);
-
-  const agregarInsumo = (insumo) => {
-    const insumoConCantidad = { ...insumo, cantidad: 1 }; // Establecer cantidad por defecto en 1
-    setSeleccionados((prev) => [...prev, insumoConCantidad]);
-    setPaginaActual(1); // Restablecer a la primera página al agregar un insumo
+  const calcularTotales = (seleccionados, requiereSeguro, porcentajeAPagar) => {
+    const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
+      const precio = insumo.pacIntCOL
+        ? typeof insumo.pacIntCOL === "string"
+          ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
+          : parseFloat(insumo.pacIntCOL) || 0
+        : 0;
+      return acc + precio * (insumo.cantidad || 1);
+    }, 0);
+    const impuesto = totalSinImpuesto * 0.04;
+    const totalConImpuesto = totalSinImpuesto + impuesto;
+    const totalConSeguro = requiereSeguro
+      ? totalConImpuesto * (porcentajeAPagar / 100)
+      : totalConImpuesto;
+    const totalConSeguroSinImpuesto = requiereSeguro
+      ? totalSinImpuesto * (porcentajeAPagar / 100)
+      : totalSinImpuesto;
+    return {
+      totalSinImpuesto,
+      impuesto,
+      totalConImpuesto,
+      totalConSeguro,
+      totalConSeguroSinImpuesto,
+    };
   };
-  const eliminarInsumo = (index) => {
-    setSeleccionados((prev) => prev.filter((_, i) => i !== index));
-  };
-  const limpiarSeleccionados = () => {
-    setSeleccionados([]);
-    localStorage.removeItem("insumosSeleccionados");
-  };
-
-  const generarPDF = () => {
-    const doc = new jsPDF("landscape");
-    doc.setFontSize(9);
+  const generarPDF = (doc, datosPaciente, diagnostico, seleccionados, totals, requiereSeguro, porcentajeAPagar, authUser, patient) => {
     // Datos del paciente
-    const datosPaciente = [
-      ["Paciente", patient],
-      ["Fecha de Nacimiento", dayOfBirth],
-      ["Correo Electrónico", email],
-    ];
-    // Tabla de datos del paciente
     autoTable(doc, {
       head: [["Datos de Paciente", ""]],
       body: datosPaciente,
@@ -142,8 +79,6 @@ export default function QuoteView({ inputs, authUser }) {
     // Espacio entre tablas
     let y = doc.lastAutoTable.finalY + 5;
     // Diagnóstico
-    const diagnostico = [["Diagnóstico", diagnostic]];
-    // Tabla de diagnóstico
     autoTable(doc, {
       head: [["Procedimientos", ""]],
       body: diagnostico,
@@ -186,27 +121,15 @@ export default function QuoteView({ inputs, authUser }) {
     });
     // Espacio entre tablas
     y = doc.lastAutoTable.finalY + 5;
-    // Cálculo de totales
-    // const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
-    //   const precio = insumo.pacIntCOL
-    //     ? typeof insumo.pacIntCOL === "string"
-    //       ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) ||
-    //         0
-    //       : parseFloat(insumo.pacIntCOL) || 0
-    //     : 0;
-    //   return acc + precio;
-    // }, 0);
-    // const impuesto = totalSinImpuesto * 0.04;
-    // const totalConImpuesto = totalSinImpuesto + impuesto;
     // Tabla de costos totales
-    const totals = [
-      ["Total con Impuesto", "", `${totalConImpuesto.toFixed(2)}`],
-      ["Impuesto (4%)", "", `${impuesto.toFixed(2)}`],
-      ["Total sin Impuesto", "", `${totalSinImpuesto.toFixed(2)}`],
+    const totalsData = [
+      ["Total con Impuesto", "", `${totals.totalConImpuesto.toFixed(2)}`],
+      ["Impuesto (4%)", "", `${totals.impuesto.toFixed(2)}`],
+      ["Total sin Impuesto", "", `${totals.totalSinImpuesto.toFixed(2)}`],
     ];
     autoTable(doc, {
       head: [["Costos Totales", "", "Monto en Colones"]],
-      body: totals,
+      body: totalsData,
       startY: y,
       theme: "striped",
       styles: {
@@ -222,15 +145,13 @@ export default function QuoteView({ inputs, authUser }) {
     y = doc.lastAutoTable.finalY + 5;
     // Costos con seguro si se requiere
     if (requiereSeguro) {
-      // const totalConSeguro = totalConImpuesto * (porcentajeAPagar / 100);
-      // const totalConSeguroSinImpuesto = totalSinImpuesto * (porcentajeAPagar / 100);
       const seguroDetails = [
         ["Porcentaje a Pagar (%)", "", `${porcentajeAPagar}%`],
-        ["Total Seguro Con impuesto", "", `${totalConSeguro.toFixed(2)}`],
+        ["Total Seguro Con impuesto", "", `${totals.totalConSeguro.toFixed(2)}`],
         [
           "Total Seguro Sin impuesto",
           "",
-          `${totalConSeguroSinImpuesto.toFixed(2)}`,
+          `${totals.totalConSeguroSinImpuesto.toFixed(2)}`,
         ],
       ];
       autoTable(doc, {
@@ -248,14 +169,12 @@ export default function QuoteView({ inputs, authUser }) {
         },
       });
     }
-
     // Espacio antes de los datos del responsable
     y = doc.lastAutoTable.finalY + 10;
     // Información del responsable
     const responsable = [
       ["Responsable", `${authUser.firstName} ${authUser.lastName}`],
     ];
-    // Tabla de responsable
     autoTable(doc, {
       head: [["Información del Responsable", ""]],
       body: responsable,
@@ -268,10 +187,30 @@ export default function QuoteView({ inputs, authUser }) {
     // Generar y guardar el PDF
     doc.save(`cotizacion ${patient}.pdf`);
   };
-
+  useEffect(() => {
+    const storedInsumos = localStorage.getItem("insumosSeleccionados");
+    if (storedInsumos) {
+      setSeleccionados(JSON.parse(storedInsumos));
+    }
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("insumosSeleccionados", JSON.stringify(seleccionados));
+  }, [seleccionados]);
+  
+  const agregarInsumo = (insumo) => {
+    const insumoConCantidad = { ...insumo, cantidad: 1 }; // Establecer cantidad por defecto en 1
+    setSeleccionados((prev) => [...prev, insumoConCantidad]);
+    setPaginaActual(1); // Restablecer a la primera página al agregar un insumo
+  };
+  const eliminarInsumo = (index) => {
+    setSeleccionados((prev) => prev.filter((_, i) => i !== index));
+  };
+  const limpiarSeleccionados = () => {
+    setSeleccionados([]);
+    localStorage.removeItem("insumosSeleccionados");
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const trimmedPatient = patient.trim();
     const trimmedDayOfBirth = dayOfBirth.trim();
     const trimmedEmail = email.trim();
@@ -287,24 +226,29 @@ export default function QuoteView({ inputs, authUser }) {
       });
       return;
     }
-
-    generarPDF();
+    const totals = calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar);
+    const doc = new jsPDF("landscape");
+    const datosPaciente = [
+      ["Paciente", patient],
+      ["Fecha de Nacimiento", dayOfBirth],
+      ["Correo Electrónico", email],
+    ];
+    const diagnostico = [["Diagnóstico", diagnostic]];
+    generarPDF(doc, datosPaciente, diagnostico, seleccionados, totals, requiereSeguro, porcentajeAPagar, authUser, patient);
   };
-
+  
   const indexOfLastInsumo = paginaActual * insumosPorPagina;
   const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
   const insumosActuales = insumosFiltrados.slice(
     indexOfFirstInsumo,
     indexOfLastInsumo
   );
-
   const paginationStyle = {
     fontSize: screenWidth < 576 ? "0.8rem" : "1rem",
     display: "flex",
     justifyContent: "center",
     marginTop: "20px",
   };
-
   const renderPagination = () => {
     const pages = [];
     const maxVisiblePages = 10;
@@ -313,7 +257,6 @@ export default function QuoteView({ inputs, authUser }) {
       paginaActual - Math.floor(maxVisiblePages / 2)
     );
     const endPage = Math.min(totalPaginas, startPage + maxVisiblePages - 1);
-
     for (let i = startPage; i <= endPage; i++) {
       if (i === startPage && i > 1) {
         pages.push(
@@ -348,7 +291,7 @@ export default function QuoteView({ inputs, authUser }) {
     }
     return pages;
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <div className="card bg-dark mt-2 mb-2">
@@ -416,14 +359,12 @@ export default function QuoteView({ inputs, authUser }) {
           </div>
         </div>
       </div>
-
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
           Insumos disponibles
         </div>
         <div className="card-body">
-          {/* CAMPO DE BÚSQUEDA */}
           <div className="mb-1">
             <div className="input-group">
               <input
@@ -443,249 +384,365 @@ export default function QuoteView({ inputs, authUser }) {
               </button>
             </div>
           </div>
-          <table className="table table-hover table-bordered">
-            <thead>
-              <tr className="table-dark">
-                <th scope="col">Numero del Artículo</th>
-                <th scope="col">Descripción del Artículo</th>
-                <th scope="col">Precio Ext (COL)</th>
-                <th scope="col">Precio Int (COL)</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr className="table-dark">
-                <th scope="col">Numero del Artículo</th>
-                <th scope="col">Descripción del Artículo</th>
-                <th scope="col">Precio Ext (COL)</th>
-                <th scope="col">Precio Int (COL)</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </tfoot>
-            <tbody>
-              {insumosActuales.map((insumo) => (
-                <tr className="table-dark" key={insumo.id}>
-                  <td>{insumo.numeroDelArticulo}</td>
-                  <td>{insumo.descripcionDelArticulo}</td>
-                  <td>{insumo.pacExtCOL}</td>
-                  <td className="text-warning">{insumo.pacIntCOL}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-outline-success"
-                      onClick={() => agregarInsumo(insumo)}
-                    >
-                      Agregar
-                    </button>
-                  </td>
+          {isNurse ? (
+            <table className="table table-hover table-bordered">
+              <thead>
+                <tr className="table-dark">
+                  <th scope="col">Numero del Artículo</th>
+                  <th scope="col">Descripción del Artículo</th>
+                  <th scope="col">Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* Paginación */}
-
-          <div style={paginationStyle}>
-            <ul className="pagination">
-              <li
-                className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}
+              </thead>
+              <tfoot>
+                <tr className="table-dark">
+                  <th scope="col">Numero del Artículo</th>
+                  <th scope="col">Descripción del Artículo</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </tfoot>
+              <tbody>
+                {insumosActuales.map((insumo) => (
+                  <tr className="table-dark" key={insumo.id}>
+                    <td>{insumo.numeroDelArticulo}</td>
+                    <td>{insumo.descripcionDelArticulo}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-outline-success"
+                        onClick={() => agregarInsumo(insumo)}
+                      >
+                        Agregar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table className="table table-hover table-bordered">
+              <thead>
+                <tr className="table-dark">
+                  <th scope="col">Numero del Artículo</th>
+                  <th scope="col">Descripción del Artículo</th>
+                  <th scope="col">Precio Ext (COL)</th>
+                  <th scope="col">Precio Int (COL)</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr className="table-dark">
+                  <th scope="col">Numero del Artículo</th>
+                  <th scope="col">Descripción del Artículo</th>
+                  <th scope="col">Precio Ext (COL)</th>
+                  <th scope="col">Precio Int (COL)</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </tfoot>
+              <tbody>
+                {insumosActuales.map((insumo) => (
+                  <tr className="table-dark" key={insumo.id}>
+                    <td>{insumo.numeroDelArticulo}</td>
+                    <td>{insumo.descripcionDelArticulo}</td>
+                    <td>{insumo.pacExtCOL}</td>
+                    <td className="text-warning">{insumo.pacIntCOL}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-outline-success"
+                        onClick={() => agregarInsumo(insumo)}
+                      >
+                        Agregar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <div style={paginationStyle} className="card-footer">
+          <ul className="pagination">
+            <li className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}>
+              <button
+                type="button"
+                className="page-link"
+                onClick={() =>
+                  setPaginaActual(paginaActual > 1 ? paginaActual - 1 : 1)
+                }
+                disabled={paginaActual === 1}
               >
-                <button
-                  type="button"
-                  className="page-link"
-                  onClick={() =>
-                    setPaginaActual(paginaActual > 1 ? paginaActual - 1 : 1)
-                  }
-                  disabled={paginaActual === 1}
-                >
-                  &laquo;
-                </button>
-              </li>
-              {renderPagination()}
-              <li
-                className={`page-item ${
-                  paginaActual === totalPaginas ? "disabled" : ""
-                }`}
+                &laquo;
+              </button>
+            </li>
+            {renderPagination()}
+            <li
+              className={`page-item ${
+                paginaActual === totalPaginas ? "disabled" : ""
+              }`}
+            >
+              <button
+                type="button"
+                className="page-link"
+                onClick={() =>
+                  setPaginaActual(
+                    paginaActual < totalPaginas
+                      ? paginaActual + 1
+                      : totalPaginas
+                  )
+                }
+                disabled={paginaActual === totalPaginas}
               >
-                <button
-                  type="button"
-                  className="page-link"
-                  onClick={() =>
-                    setPaginaActual(
-                      paginaActual < totalPaginas
-                        ? paginaActual + 1
-                        : totalPaginas
-                    )
-                  }
-                  disabled={paginaActual === totalPaginas}
-                >
-                  &raquo;
-                </button>
-              </li>
-            </ul>
-          </div>
+                &raquo;
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
-
       <div className="card bg-dark mt-2 mb-2">
         <div className="card-header text-success">
           <i className="fas fa-columns me-1"></i>
           Insumos seleccionados
         </div>
-        <div className="card-body">
-          {seleccionados.length > 0 ? (
-            <div>
-              <table className="table table-hover table-bordered">
-                <thead>
-                  <tr className="table-dark">
-                    <th scope="col">Numero del Artículo</th>
-                    <th scope="col">Descripción del Artículo</th>
-                    <th scope="col">Precio Int (COL)</th>
-                    <th scope="col">Cantidad</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tfoot>
-                  <tr className="table-dark">
-                    <th colSpan="2" className="text-end">
-                      Costos Totales
-                    </th>
-                    <th colSpan="3" className="text-end">
-                      Montos Totales
-                    </th>
-                  </tr>
-                  <tr className="table-dark">
-                    <td colSpan="2" className="text-end">
-                      Total con Impuesto (4%):
-                    </td>
-                    <td colSpan="3" className="text-end text-warning">
-                      {totalConImpuesto.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr className="table-dark">
-                    <td colSpan="2" className="text-end">
-                      Total sin Impuesto:
-                    </td>
-                    <td colSpan="3" className="text-end text-warning">
-                      {totalSinImpuesto.toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr className="table-dark">
-                    <td colSpan="2" className="text-end">
-                      Requiere seguro
-                    </td>
-                    <td colSpan="3" className="text-end text-warning">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={requiereSeguro}
-                        onChange={(e) => setRequiereSeguro(e.target.checked)}
-                      />
-                    </td>
-                  </tr>
-                  {requiereSeguro && (
-                    <>
+        {isNurse ? (
+          <>
+            <div className="card-body">
+              {seleccionados.length > 0 ? (
+                <div>
+                  <table className="table table-hover table-bordered">
+                    <thead>
+                      <tr className="table-dark">
+                        <th scope="col">Numero del Artículo</th>
+                        <th scope="col">Descripción del Artículo</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {seleccionados.map((insumo, index) => (
+                        <tr className="table-dark" key={index}>
+                          <td>{insumo.numeroDelArticulo}</td>
+                          <td>{insumo.descripcionDelArticulo}</td>
+                          <td>
+                            <input
+                              className="bg-dark text-info border-info"
+                              type="number"
+                              value={insumo.cantidad || 1}
+                              min={1}
+                              onChange={(e) => {
+                                const nuevaCantidad =
+                                  parseInt(e.target.value) || 1;
+                                setSeleccionados((prev) => {
+                                  const nuevosInsumos = [...prev];
+                                  nuevosInsumos[index] = {
+                                    ...insumo,
+                                    cantidad: nuevaCantidad,
+                                  };
+                                  return nuevosInsumos;
+                                });
+                              }}
+                              style={{ width: "60px" }}
+                            />
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger"
+                              onClick={() => eliminarInsumo(index)}
+                            >
+                              Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>No se han seleccionado insumos.</p>
+              )}
+            </div>
+            <div className="card-footer d-flex align-items-center justify-content-end">
+              {formErrors.general && (
+                <small className="form-text text-warning text-end m-1">
+                  {formErrors.general}
+                </small>
+              )}
+              <button
+                type="submit"
+                className="btn btn-outline-primary mt-2 mb-2 m-1"
+                disabled={seleccionados.length === 0}
+              >
+                Compartir insumos
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-danger mt-2 mb-2 m-1"
+                onClick={limpiarSeleccionados}
+              >
+                Limpiar Seleccionados
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="card-body">
+              {seleccionados.length > 0 ? (
+                <div>
+                  <table className="table table-hover table-bordered">
+                    <thead>
+                      <tr className="table-dark">
+                        <th scope="col">Numero del Artículo</th>
+                        <th scope="col">Descripción del Artículo</th>
+                        <th scope="col">Precio Int (COL)</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr className="table-dark">
+                        <th colSpan="2" className="text-end">
+                          Costos Totales
+                        </th>
+                        <th colSpan="3" className="text-end">
+                          Montos Totales
+                        </th>
+                      </tr>
                       <tr className="table-dark">
                         <td colSpan="2" className="text-end">
-                          Porcentaje a Pagar (%):
+                          Total con Impuesto (4%):
                         </td>
-                        <td colSpan="3">
+                        <td colSpan="3" className="text-end text-warning">
+                          {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalConImpuesto.toFixed(2)}
+                        </td>
+                      </tr>
+                      <tr className="table-dark">
+                        <td colSpan="2" className="text-end">
+                          Total sin Impuesto:
+                        </td>
+                        <td colSpan="3" className="text-end text-warning">
+                          {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalSinImpuesto.toFixed(2)}
+                        </td>
+                      </tr>
+                      <tr className="table-dark">
+                        <td colSpan="2" className="text-end">
+                          Requiere seguro
+                        </td>
+                        <td colSpan="3" className="text-end text-warning">
                           <input
-                            className="form-control bg-dark text-info border-info text-end"
-                            type="text"
-                            id="porcentajeAPagar"
-                            value={porcentajeAPagar}
-                            onChange={(e) =>
-                              setPorcentajeAPagar(
-                                parseFloat(e.target.value) || 0
-                              )
-                            }
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={requiereSeguro}
+                            onChange={(e) => setRequiereSeguro(e.target.checked)}
                           />
                         </td>
                       </tr>
-                      <tr className="table-dark">
-                        <td colSpan="2" className="text-end">
-                          Total Seguro con Impuesto:
-                        </td>
-                        <td colSpan="3" className="text-end text-warning">
-                          {totalConSeguro.toFixed(2)}
-                        </td>
-                      </tr>
-                      <tr className="table-dark">
-                        <td colSpan="2" className="text-end">
-                          Total Seguro sin Impuesto:
-                        </td>
-                        <td colSpan="3" className="text-end text-warning">
-                          {totalConSeguroSinImpuesto.toFixed(2)}
-                        </td>
-                      </tr>
-                    </>
-                  )}
-                </tfoot>
-                <tbody>
-                  {seleccionados.map((insumo, index) => (
-                    <tr className="table-dark" key={index}>
-                      <td>{insumo.numeroDelArticulo}</td>
-                      <td>{insumo.descripcionDelArticulo}</td>
-                      <td className="text-warning">{insumo.pacIntCOL}</td>
-                      <td>
-                        <input
-                          className="bg-dark text-info border-info"
-                          type="number"
-                          value={insumo.cantidad || 1} // Usar la cantidad del insumo
-                          min={1}
-                          onChange={(e) => {
-                            const nuevaCantidad = parseInt(e.target.value) || 1;
-                            setSeleccionados((prev) => {
-                              const nuevosInsumos = [...prev];
-                              nuevosInsumos[index] = {
-                                ...insumo,
-                                cantidad: nuevaCantidad,
-                              };
-                              return nuevosInsumos;
-                            });
-                          }}
-                          style={{ width: "60px" }}
-                        />
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger"
-                          onClick={() => eliminarInsumo(index)}
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      {requiereSeguro && (
+                        <>
+                          <tr className="table-dark">
+                            <td colSpan="2" className="text-end">
+                              Porcentaje a Pagar (%):
+                            </td>
+                            <td colSpan="3">
+                              <input
+                                className="form-control bg-dark text-info border-info text-end"
+                                type="text"
+                                id="porcentajeAPagar"
+                                value={porcentajeAPagar}
+                                onChange={(e) =>
+                                  setPorcentajeAPagar(
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                              />
+                            </td>
+                          </tr>
+                          <tr className="table-dark">
+                            <td colSpan="2" className="text-end">
+                              Total Seguro con Impuesto:
+                            </td>
+                            <td colSpan="3" className="text-end text-warning">
+                              {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalConSeguro.toFixed(2)}
+                            </td>
+                          </tr>
+                          <tr className="table-dark">
+                            <td colSpan="2" className="text-end">
+                              Total Seguro sin Impuesto:
+                            </td>
+                            <td colSpan="3" className="text-end text-warning">
+                              {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalConSeguroSinImpuesto.toFixed(2)}
+                            </td>
+                          </tr>
+                        </>
+                      )}
+                    </tfoot>
+                    <tbody>
+                      {seleccionados.map((insumo, index) => (
+                        <tr className="table-dark" key={index}>
+                          <td>{insumo.numeroDelArticulo}</td>
+                          <td>{insumo.descripcionDelArticulo}</td>
+                          <td className="text-warning">{insumo.pacIntCOL}</td>
+                          <td>
+                            <input
+                              className="bg-dark text-info border-info"
+                              type="number"
+                              value={insumo.cantidad || 1}
+                              min={1}
+                              onChange={(e) => {
+                                const nuevaCantidad =
+                                  parseInt(e.target.value) || 1;
+                                setSeleccionados((prev) => {
+                                  const nuevosInsumos = [...prev];
+                                  nuevosInsumos[index] = {
+                                    ...insumo,
+                                    cantidad: nuevaCantidad,
+                                  };
+                                  return nuevosInsumos;
+                                });
+                              }}
+                              style={{ width: "60px" }}
+                            />
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger"
+                              onClick={() => eliminarInsumo(index)}
+                            >
+                              Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>No se han seleccionado insumos.</p>
+              )}
             </div>
-          ) : (
-            <p>No se han seleccionado insumos.</p>
-          )}
-        </div>
-        <div className="card-footer d-flex align-items-center justify-content-end">
-          {formErrors.general && (
-            <small className="form-text text-warning text-end m-1">
-              {formErrors.general}
-            </small>
-          )}
-          <button
-            type="submit"
-            className="btn btn-outline-primary mt-2 mb-2 m-1"
-            disabled={seleccionados.length === 0}
-          >
-            Generar PDF
-          </button>
-          <button
-            type="button"
-            className="btn btn-outline-danger mt-2 mb-2 m-1"
-            onClick={limpiarSeleccionados}
-          >
-            Limpiar Seleccionados
-          </button>
-        </div>
+            <div className="card-footer d-flex align-items-center justify-content-end">
+              {formErrors.general && (
+                <small className="form-text text-warning text-end m-1">
+                  {formErrors.general}
+                </small>
+              )}
+              <button
+                type="submit"
+                className="btn btn-outline-primary mt-2 mb-2 m-1"
+                disabled={seleccionados.length === 0}
+              >
+                Generar PDF
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-danger mt-2 mb-2 m-1"
+                onClick={limpiarSeleccionados}
+              >
+                Limpiar Seleccionados
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </form>
   );

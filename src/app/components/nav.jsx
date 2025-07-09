@@ -5,10 +5,12 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { logout } from "../actions/auth";
 
-export default function NavComponent({ dataUser, authUser, isAdmin }) {
-  
-  const basePath = isAdmin ? '/admin/dashboard' : '/dashboard';
+export default function NavComponent({ dataUser, authUser, isNurse, isAdmin }) {
+  const basePath = isAdmin ? "/admin/dashboard" : "/dashboard";
 
+  // console.log("isAdmin:", isAdmin);
+  // console.log("isNurse:", isNurse);
+  // console.log("authUser:", authUser);
   // ** SE OBTIENEN DATOS DE USUARIO LOGEADO
   // console.log(authUser);
 
@@ -43,22 +45,23 @@ export default function NavComponent({ dataUser, authUser, isAdmin }) {
 
   return (
     <>
-      <nav
-        id="mainNav"
-        className="sb-topnav navbar navbar-expand navbar-dark bg-dark"
-      >
-        <Link className="navbar-brand ps-3" href="#!">
-          {data.generalInformation.websiteName}
-        </Link>
-        <button
-          className="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
-          id="sidebarToggle"
-          href="#!"
+      {isAdmin ? (
+        <nav
+          id="mainNav"
+          className="sb-topnav navbar navbar-expand navbar-dark bg-dark"
         >
-          <i className="fas fa-bars"></i>
-        </button>
-        <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-          {/* <div className="input-group">
+          <Link className="navbar-brand ps-3" href="#!">
+            {data.generalInformation.websiteName}
+          </Link>
+          <button
+            className="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
+            id="sidebarToggle"
+            href="#!"
+          >
+            <i className="fas fa-bars"></i>
+          </button>
+          <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            {/* <div className="input-group">
             <input
               className="form-control"
               type="text"
@@ -74,40 +77,188 @@ export default function NavComponent({ dataUser, authUser, isAdmin }) {
               <i className="fas fa-search"></i>
             </button>
           </div> */}
-        </form>
-        <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-          <li className="nav-item dropdown">
-            <Link
-              className="nav-link dropdown-toggle"
-              id="navbarDropdown"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <i className="fas fa-user fa-fw"></i>
-            </Link>
-            <ul
-              className="dropdown-menu dropdown-menu-end"
-              aria-labelledby="navbarDropdown"
-            >
-              <li>
-                <Link className="dropdown-item" href={`${basePath}/${authUser ? authUser._id.toString() : ''}`}>
-                  Configuración
-                </Link>
-              </li>
-              <li>
-                <hr className="dropdown-divider" />
-              </li>
-              <form action={logout}>
+          </form>
+          <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li className="nav-item dropdown">
+              <Link
+                className="nav-link dropdown-toggle"
+                id="navbarDropdown"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fas fa-user fa-fw"></i>
+              </Link>
+              <ul
+                className="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdown"
+              >
                 <li>
-                  <button className="dropdown-item">Cerrar Sesión</button>
+                  <Link
+                    className="dropdown-item"
+                    href={`${basePath}/${
+                      authUser ? authUser._id.toString() : ""
+                    }`}
+                  >
+                    Configuración
+                  </Link>
                 </li>
-              </form>
-            </ul>
-          </li>
-        </ul>
-      </nav>
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <form action={logout}>
+                  <li>
+                    <button className="dropdown-item">Cerrar Sesión</button>
+                  </li>
+                </form>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      ) : isNurse ? (
+        <nav
+          id="mainNav"
+          className="sb-topnav navbar navbar-expand navbar-dark bg-dark"
+        >
+          <Link className="navbar-brand ps-3" href="#!">
+            {data.generalInformation.websiteName}
+          </Link>
+          <button
+            className="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
+            id="sidebarToggle"
+            href="#!"
+          >
+            <i className="fas fa-bars"></i>
+          </button>
+          <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            {/* <div className="input-group">
+            <input
+              className="form-control"
+              type="text"
+              placeholder="Buscar..."
+              aria-label="Buscar..."
+              aria-describedby="btnNavbarSearch"
+            />
+            <button
+              className="btn btn-primary"
+              id="btnNavbarSearch"
+              type="button"
+            >
+              <i className="fas fa-search"></i>
+            </button>
+          </div> */}
+          </form>
+          <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li className="nav-item dropdown">
+              <Link
+                className="nav-link dropdown-toggle"
+                id="navbarDropdown"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fas fa-user fa-fw"></i>
+              </Link>
+              <ul
+                className="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdown"
+              >
+                <li>
+                  <Link
+                    className="dropdown-item"
+                    href={`/nurse/dashboard/${
+                      authUser ? authUser._id.toString() : ""
+                    }`}
+                  >
+                    Configuración
+                  </Link>
+                </li>
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <form action={logout}>
+                  <li>
+                    <button className="dropdown-item">Cerrar Sesión</button>
+                  </li>
+                </form>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      ) : (
+        <nav
+          id="mainNav"
+          className="sb-topnav navbar navbar-expand navbar-dark bg-dark"
+        >
+          <Link className="navbar-brand ps-3" href="#!">
+            {data.generalInformation.websiteName}
+          </Link>
+          <button
+            className="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
+            id="sidebarToggle"
+            href="#!"
+          >
+            <i className="fas fa-bars"></i>
+          </button>
+          <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            {/* <div className="input-group">
+            <input
+              className="form-control"
+              type="text"
+              placeholder="Buscar..."
+              aria-label="Buscar..."
+              aria-describedby="btnNavbarSearch"
+            />
+            <button
+              className="btn btn-primary"
+              id="btnNavbarSearch"
+              type="button"
+            >
+              <i className="fas fa-search"></i>
+            </button>
+          </div> */}
+          </form>
+          <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li className="nav-item dropdown">
+              <Link
+                className="nav-link dropdown-toggle"
+                id="navbarDropdown"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i className="fas fa-user fa-fw"></i>
+              </Link>
+              <ul
+                className="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdown"
+              >
+                <li>
+                  <Link
+                    className="dropdown-item"
+                    href={`${basePath}/${
+                      authUser ? authUser._id.toString() : ""
+                    }`}
+                  >
+                    Configuración
+                  </Link>
+                </li>
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <form action={logout}>
+                  <li>
+                    <button className="dropdown-item">Cerrar Sesión</button>
+                  </li>
+                </form>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      )}
     </>
   );
 }

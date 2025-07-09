@@ -1,21 +1,21 @@
 import getAuthUser from "@/lib/getAuthUser";
-import dataUser from "../Utils/dataUser";
+import dataUser from "@/app/Utils/dataNurse";
 
-import FooterComponent from "../components/footer";
-import NavComponent from "../components/nav";
-import NavLinkComponent from "../components/navLink";
+import FooterComponent from "@/app/components/footer";
+import NavComponent from "@/app/components/nav";
+import NavLinkComponent from "@/app/components/navLink";
 import Link from "next/link";
-import ErrNoAuth from "../components/401Error";
+import ErrNoAuth from "@/app/components/401Error";
 import { getCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export default async function DashboardLayout({ children }) {
+export default async function SuggestionsNurseLayout({ children }) {
   const authUser = await getAuthUser();
   const authUserId = authUser.userId;
-  const userCollection = await getCollection("users");
+  const userCollection = await getCollection("nurse");
 
   const user =
-    authUserId && authUserId.length === 24
+  authUserId && authUserId.length === 24
       ? await userCollection?.findOne({
           _id: ObjectId.createFromHexString(authUserId),
         })
@@ -32,10 +32,11 @@ export default async function DashboardLayout({ children }) {
     <>
       {authUserId ? (
         <div className="sb-nav-fixed">
-          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={false} isNurse={false} />
+          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isNurse={true} isAdmin={false}/>
+          {/* <FooterComponent /> */}
           <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={false} isNurse={false} />
+              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isNurse={true} isAdmin={false} />
             </div>
             <div id="layoutSidenav_content">
               <main>

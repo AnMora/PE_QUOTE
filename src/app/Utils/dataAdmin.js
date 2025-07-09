@@ -13,6 +13,11 @@ const CUPPanelAdmin = {
       icon: "fas fa-table",
     },
     {
+      path: "/admin/register/register-nurse",
+      session: "Enfermeros",
+      icon: "fas fa-table",
+    },
+    {
       path: "/admin/register/register-user",
       session: "Empleados",
       icon: "fas fa-table",
@@ -22,26 +27,31 @@ const CUPPanelAdmin = {
   pageList: [
     {
       path: "/admin/list/list-admin",
-      session: "Lista de usuarios",
+      session: "Lista de administradores",
+      icon: "fas fa-tachometer-alt",
+    },
+    {
+      path: "/admin/list/list-nurse",
+      session: "Lista de enfermeria",
       icon: "fas fa-tachometer-alt",
     },
     {
       path: "/admin/list/list-users",
-      session: "Lista de usuarios",
+      session: "Lista de empleados",
       icon: "fas fa-tachometer-alt",
     }
   ],
   pageAddons: [
     {
-      path: "/admin/proformas",
-      session: "Proformas",
-      icon: "fas fa-columns",
-    },
-    {
-      path: "/admin/convenios",
-      session: "Convenios",
+      path: "/admin/assents",
+      session: "Consentimientos",
       icon: "fas fa-book-open",
     },
+    {
+      path: "/admin/formal",
+      session: "Proformas",
+      icon: "fas fa-columns",
+    }   
   ],
   generalInformation: {
     websiteName: "Cotizador PE",

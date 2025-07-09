@@ -1,9 +1,9 @@
 import { getCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export default async function DashboardUser({ params }) {
+export default async function DashboardNurse({ params }) {
   const { id } = await params;
-  const userCollection = await getCollection("users");
+  const userCollection = await getCollection("nurse");
   const user =
     id.length === 24
       ? await userCollection?.findOne({
@@ -14,7 +14,7 @@ export default async function DashboardUser({ params }) {
   return (
     <>
       <h1 className="mt-4">
-        Panel Usuario {user.firstName} {user.lastName}
+        Panel Enfermería {user.firstName} {user.lastName}
       </h1>
       <p>Actualizaciones en sistema cotizador</p>
 

@@ -2,8 +2,10 @@
 
 import { useActionState } from "react";
 
-export default function SuggestionFormComponent({ handler, suggestion }) {
+export default function SuggestionFormComponent({ handler, suggestion, isNurse }) {
   const [state, action, isPending] = useActionState(handler, undefined);
+
+  console.log(isNurse);  
 
   return (
     <div className="card-body">

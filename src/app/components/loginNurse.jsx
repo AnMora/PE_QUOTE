@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useActionState } from "react";
-import { login } from "../actions/auth";
+import { loginNurse } from "../actions/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginComponent(params) {
-  const [state, action, isPending] = useActionState(login, undefined);
+export default function LoginNurseComponent(params) {
+  const [state, action, isPending] = useActionState(loginNurse, undefined);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -24,7 +24,7 @@ export default function LoginComponent(params) {
               <div className="card bg-dark mt-2 mb-2">
                 <div className="card-header text-success">
                   <i className="fas fa-user fa-fw me-1"></i>
-                  Usuario Hospital Metropolitano
+                  Enfermería Hospital Metropolitano
                 </div>
                 <div className="card-body">
                   <form action={action}>
@@ -90,10 +90,10 @@ export default function LoginComponent(params) {
                 </div>
                 <div className="card-footer">
                   <div className="d-flex align-items-center justify-content-between">
-                    <p className="pt-2">¿Eres enfermero/a?</p>
-                    <Link className="nav-link" href="/nurse">
+                    <p className="pt-2">¿Eres de admisión?</p>
+                    <Link className="nav-link" href="/">
                       <button className="btn btn-outline-danger">
-                        Ir a enfermería
+                        Ir para admisión
                       </button>
                     </Link>
                   </div>

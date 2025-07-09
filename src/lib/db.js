@@ -27,6 +27,7 @@ async function getDB(dbName) {
   }
   return dbInstance;
 }
+
 export async function getCollection(collectionName) {
   const db = await getDB("Quote");
   if (db) return db.collection(collectionName);

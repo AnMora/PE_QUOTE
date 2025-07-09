@@ -64,6 +64,62 @@ export async function createPost(state, formData) {
   redirect("/suggestions");
 }
 
+export async function createNursePost(state, formData) {
+  // ** CHECK IF USER IS SIGNED IN
+  const user = await getAuthUser();
+  if (!user) return redirect("/");
+
+  // ** VALIDATE FORM FIELDS
+  const title = formData.get("title");
+  const description = formData.get("description");
+
+  const validateFields = SuggestionFormSchema.safeParse({
+    title,
+    description,
+  });
+
+  // ** IF ANY FORM FIELDS ARE INVALID
+  if (!validateFields.success) {
+    return {
+      errors: validateFields.error.flatten().fieldErrors,
+      title,
+      description,
+    };
+  }
+
+  // ** CHECK IF USER EXISTS IN THE DATABASE
+  const userCollection = await getCollection("nurse");
+  if (!userCollection) return { errors: { email: "Server error!" } };
+
+  // ** FIND USER IN DATABASE
+  const dbUser = await userCollection.findOne({
+    _id: ObjectId.createFromHexString(user.userId),
+  });
+  if (!dbUser) return { errors: { user: "User not found!" } };
+
+  // ** SAVE THE NEW POST IN DB
+  try {
+    const suggestionCollection = await getCollection("suggestions");
+    const suggestion = {
+      title: validateFields.data.title,
+      description: validateFields.data.description,
+      userId: dbUser._id,
+      userFirstName: dbUser.firstName,
+      userLastName: dbUser.lastName,
+    };
+    await suggestionCollection.insertOne(suggestion);
+  } catch (error) {
+    return {
+      errors: {
+        title: error.message,
+      },
+    };
+  }
+
+  // ** REDIRECT
+  redirect("/nurse/suggestions");
+}
+
 export async function editPost(state, formData) {
   // ** CHECK IF USER IS SIGNED IN
   const user = await getAuthUser();
@@ -114,6 +170,56 @@ export async function editPost(state, formData) {
   redirect("/suggestions");
 }
 
+export async function editNursePost(state, formData) {
+  // ** CHECK IF USER IS SIGNED IN
+  const user = await getAuthUser();
+  if (!user) return redirect("/");
+
+  // console.log(formData.get("suggestionId"));
+
+  // ** VALIDATE FORM FIELDS
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const suggestionId = formData.get("suggestionId");
+
+  const validateFields = SuggestionFormSchema.safeParse({
+    title,
+    description,
+  });
+
+  // ** IF ANY FORM FIELDS ARE INVALID
+  if (!validateFields.success) {
+    return {
+      errors: validateFields.error.flatten().fieldErrors,
+      title,
+      description,
+    };
+  }
+
+  // ** FIND THE POST THAT WE WANT UPDATE
+  const suggestionCollection = await getCollection("suggestions");
+  const suggestion = await suggestionCollection.findOne({
+    _id: ObjectId.createFromHexString(suggestionId),
+  });
+
+  // ** CHECK THE AUTH USER OWNS THE POST
+  if (user.userId !== suggestion.userId.toString()) redirect("/nurse/suggestions");
+
+  // ** UPDATE THE POST IN DB
+  suggestionCollection.findOneAndUpdate(
+    { _id: suggestion._id },
+    {
+      $set: {
+        title: validateFields.data.title,
+        description: validateFields.data.description,
+      },
+    }
+  );
+
+  // ** REDIRECT
+  redirect("/nurse/suggestions");
+}
+
 export async function deletePost(formData) {
   // ** CHECK IF USER IS SIGNED IN
   const user = await getAuthUser();
@@ -136,4 +242,28 @@ export async function deletePost(formData) {
 
   // ** REDIRECT
   redirect("/suggestions");
+}
+
+export async function deleteNursePost(formData) {
+  // ** CHECK IF USER IS SIGNED IN
+  const user = await getAuthUser();
+  if (!user) return redirect("/");
+
+  // ** GET THE ID FORM FIELD
+  const suggestionId = formData.get("suggestionId");
+
+  // ** FIND THE POST
+  const suggestionCollection = await getCollection("suggestions");
+  const suggestion = await suggestionCollection.findOne({
+    _id: ObjectId.createFromHexString(suggestionId),
+  });
+
+  // ** CHECK THE AUTH USER OWNS THE POST
+  if (user.userId !== suggestion.userId.toString()) redirect("/nurse/suggestions");
+
+  // ** DELETE THE POST
+  suggestionCollection.findOneAndDelete({ _id: suggestion._id })
+
+  // ** REDIRECT
+  redirect("/nurse/suggestions");
 }

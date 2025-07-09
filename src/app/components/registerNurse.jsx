@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
-import { registerAdmin } from "../actions/auth";
+import { registerNurse } from "../actions/auth";
 
-export default function RegisterAdminComponent(params) {
-  const [state, action, isPending] = useActionState(registerAdmin, undefined);
+export default function RegisterNurseComponent(params) {
+  const [state, action, isPending] = useActionState(registerNurse, undefined);
 
   return (
     <div id="layoutAuthentication_content">
@@ -12,10 +13,10 @@ export default function RegisterAdminComponent(params) {
         <div className="container px-2">
           <div className="row justify-content-center">
             <div className="col-lg-8">
-            <div className="card bg-dark mt-2 mb-2">
+              <div className="card bg-dark mt-2 mb-2">
                 <div className="card-header text-success">
                   <i className="fas fa-user fa-fw me-1"></i>
-                  Crear administrador Hospital Metropolitano
+                  Crear enfermero Hospital Metropolitano
                 </div>
                 <div className="card-body">
                   <form action={action}>
@@ -115,7 +116,7 @@ export default function RegisterAdminComponent(params) {
                             placeholder="Confirm password"
                           />
                           <label htmlFor="inputPasswordConfirm">
-                          Confirmar Contraseña
+                            Confirmar Contraseña
                           </label>
                           {state?.errors?.confirmPassword && (
                             <small
@@ -129,7 +130,7 @@ export default function RegisterAdminComponent(params) {
                       </div>
                     </div>
                     <div className="mt-4 mb-0">
-                    <div className="d-grid">
+                      <div className="d-grid">
                         <button
                           disabled={isPending}
                           className="btn btn-outline-primary btn-block"

@@ -1,5 +1,5 @@
 import getAuthUser from "@/lib/getAuthUser";
-import dataUser from "../../Utils/dataAdmin";
+import dataUser from "@/app/Utils/dataAdmin";
 
 import NavComponent from "@/app/components/nav";
 import NavLinkComponent from "@/app/components/navLink";
@@ -31,10 +31,10 @@ export default async function DashboardLayoutAdmin({ children }) {
     <>
       {authUserId ? (
         <div className="sb-nav-fixed">
-          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} />
+          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} isNurse={false} />
           <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} />
+              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} isNurse={false} />
             </div>
             <div id="layoutSidenav_content">
               <main>

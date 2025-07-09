@@ -1,5 +1,5 @@
 import getAuthUser from "@/lib/getAuthUser";
-import dataUser from "../Utils/dataUser";
+import dataUser from "@/app/Utils/dataUser";
 
 import FooterComponent from "../components/footer";
 import NavComponent from "../components/nav";
