@@ -57,3 +57,30 @@ export const SuggestionFormSchema = z.object({
     .min(1, { message: "La descripción es requerida" })
     .trim(),
 });
+
+export const QuoteViewPatientSchema = z.object({
+  fullName: z
+    .string()
+    .min(7, { message: "El nombre completo es requerido" })
+    .max(20, { message: "El nombre completo no puede tener más de 20 caracteres" })
+    .trim(),
+
+  dateOfBirth: z
+    .string()
+    .min(8, { message: "La fecha de nacimiento es requerida" })
+    .regex(/[0-9]/, { message: "Debe contener los numeros" })
+      .regex(/[a-zA-Z0-9]/, {
+        message: "Debe tener la separacion de carácter especial",
+      })
+    .trim(),
+    
+  email: z
+    .string()
+    .email({ message: "Ingrese un formato de correo valido" })
+    .trim(),
+
+  diagnostic: z
+    .string()
+    .min(1, { message: "La descripción es requerida" })
+    .trim(),
+});

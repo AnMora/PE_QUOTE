@@ -55,7 +55,7 @@ export async function register(state, formData) {
   // await createSession(results.insertedId.toString());
 
   // **REDIRECT
-  redirect("/admin/dashboard");
+  redirect("/admin/information/users/show-users");
 }
 
 export async function registerNurse(state, formData) {
@@ -106,7 +106,7 @@ export async function registerNurse(state, formData) {
   // await createSession(results.insertedId.toString());
 
   // **REDIRECT
-  redirect("/admin/dashboard");
+  redirect("/admin/information/nurses/show-nurses");
 }
 
 export async function registerAdmin(state, formData) {
@@ -157,7 +157,7 @@ export async function registerAdmin(state, formData) {
   // await createSession(results.insertedId.toString());
 
   // **REDIRECT
-  redirect("/admin/dashboard");
+  redirect("/admin/information/admins/show-admins");
 }
 
 export async function login(state, formData) {

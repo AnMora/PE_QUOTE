@@ -1,250 +1,214 @@
 "use client";
-
 import Link from "next/link";
-
-export default function NavLinkComponent({ dataUser, authUser, isNurse, isAdmin }) {
-  const data = dataUser; 
-
-  const PageDashboard = data.pageDashboard.map((item, position) => {
-    return (
+export default function NavLinkComponent({
+  dataUser,
+  authUser,
+  isNurse,
+  isAdmin,
+}) {
+  const data = dataUser;
+  const renderLinks = (items) => {
+    return items.map((item, position) => (
       <div key={position}>
         <Link className="nav-link" href={item.path}>
-          <div className="sb-nav-link-icon">
-            <i className={item.icon}></i>
-          </div>
+          {item.icon && (
+            <div className="sb-nav-link-icon">
+              <i className={item.icon}></i>
+            </div>
+          )}
           {item.session}
         </Link>
       </div>
-    );
-  });
+    ));
+  };
+  const renderAdminNav = () => (
+    <nav className="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+      <div className="sb-sidenav-menu">
+        <div className="nav">
+          <div className="sb-sidenav-menu-heading text-info">Panel Principal</div>
+          {renderLinks(data.pageDashboard)}
 
-  // **OPCIONES PARA NAV ADMIN
-  const PageInterfaceAdmin = data.pageInterface.map((item, position) => {
-    return (
-      <div key={position}>
-        <Link className="nav-link" href={item.path}>
-          {item.session}
-        </Link>
-      </div>
-    );
-  });
-
-  // ** OPCIONES PARA NAV USUARIO
-  const PageInterface = data.pageInterface.map((item, position) => {
-    return (
-      <div key={position}>
-        <Link className="nav-link" href={item.path}>
-          <div className="sb-nav-link-icon">
-            <i className={item.icon}></i>
-          </div>
-          {item.session}
-        </Link>
-      </div>
-    );
-  });
-
-  const PageAddons = data.pageAddons.map((item, position) => {
-    return (
-      <div key={position}>
-        <Link className="nav-link" href={item.path}>
-          <div className="sb-nav-link-icon">
-            <i className={item.icon}></i>
-          </div>
-          {item.session}
-        </Link>
-      </div>
-    );
-  });
-
-  // ** REVISAR BIEN QUE OPCIONES SE DESEAN PARA EL LADO ADMINISTRADOR - QUE IMPORTA? - QUE DEBE SER UIL VER?
-
-  return (
-    <>
-      {isAdmin ? (
-        <nav
-          className="sb-sidenav accordion sb-sidenav-dark"
-          id="sidenavAccordion"
-        >
-          <div className="sb-sidenav-menu">
-            <div className="nav">
-              <div className="sb-sidenav-menu-heading">Panel Principal</div>
-              {PageDashboard}
-              <div className="sb-sidenav-menu-heading">Interfaces</div>
-              {/* {PageInterface}
-            {PageInterfaceRegister} */}
-
+          <div className="sb-sidenav-menu-heading text-success">Interfaces</div>
+          {/* Dropdown para listado de usuarios */}
+          <a
+            className="nav-link collapsed"
+            href="#"
+            data-bs-toggle="collapse"
+            data-bs-target="#Information"
+            aria-expanded="false"
+            aria-controls="collapsePages"
+          >
+            <div className="sb-nav-link-icon">
+              <i className="fas fa-book-open text-success"></i>
+            </div>
+            Listado de usuarios
+            <div className="sb-sidenav-collapse-arrow">
+              <i className="fas fa-angle-down text-success"></i>
+            </div>
+          </a>
+          <div
+            className="collapse"
+            id="Information"
+            aria-labelledby="headingTwo"
+            data-bs-parent="#sidenavAccordion"
+          >
+            <nav className="sb-sidenav-menu-nested nav">
+              {/* Dropdown para Administradores */}
               <a
                 className="nav-link collapsed"
                 href="#"
                 data-bs-toggle="collapse"
-                data-bs-target="#collapseLayouts"
+                data-bs-target="#InfoAdmins"
                 aria-expanded="false"
-                aria-controls="collapseLayouts"
+                aria-controls="InfoAdmins"
               >
-                <div className="sb-nav-link-icon">
-                  <i className="fas fa-book-open"></i>
-                </div>
-                Listado de usuarios
+                Administradores
                 <div className="sb-sidenav-collapse-arrow">
-                  <i className="fas fa-angle-down"></i>
+                  <i className="fas fa-angle-down text-success"></i>
                 </div>
               </a>
               <div
                 className="collapse"
-                id="collapseLayouts"
+                id="InfoAdmins"
                 aria-labelledby="headingOne"
-                data-bs-parent="#sidenavAccordion"
+                data-bs-parent="#Information"
               >
                 <nav className="sb-sidenav-menu-nested nav">
-                  {PageInterfaceAdmin}
+                  {renderLinks(data.pageInformationAdmins)}
                 </nav>
               </div>
-
+              {/* Dropdown para Enfermeros */}
               <a
                 className="nav-link collapsed"
                 href="#"
                 data-bs-toggle="collapse"
-                data-bs-target="#collapsePages"
+                data-bs-target="#InfoNurses"
                 aria-expanded="false"
-                aria-controls="collapsePages"
+                aria-controls="InfoNurses"
               >
-                <div className="sb-nav-link-icon">
-                  <i className="fas fa-book-open"></i>
-                </div>
-                Pages
+                Enfermeros
                 <div className="sb-sidenav-collapse-arrow">
-                  <i className="fas fa-angle-down"></i>
+                  <i className="fas fa-angle-down text-success"></i>
                 </div>
               </a>
               <div
                 className="collapse"
-                id="collapsePages"
+                id="InfoNurses"
                 aria-labelledby="headingTwo"
-                data-bs-parent="#sidenavAccordion"
+                data-bs-parent="#Information"
               >
-                <nav
-                  className="sb-sidenav-menu-nested nav accordion"
-                  id="sidenavAccordionPages"
-                >
-                  <a
-                    className="nav-link collapsed"
-                    href="#"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#pagesCollapseAuth"
-                    aria-expanded="false"
-                    aria-controls="pagesCollapseAuth"
-                  >
-                    Authentication
-                    <div className="sb-sidenav-collapse-arrow">
-                      <i className="fas fa-angle-down"></i>
-                    </div>
-                  </a>
-                  <div
-                    className="collapse"
-                    id="pagesCollapseAuth"
-                    aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordionPages"
-                  >
-                    <nav className="sb-sidenav-menu-nested nav">
-                      <a className="nav-link" href="login.html">
-                        Login
-                      </a>
-                      <a className="nav-link" href="register.html">
-                        Register
-                      </a>
-                      <a className="nav-link" href="password.html">
-                        Forgot Password
-                      </a>
-                    </nav>
-                  </div>
-                  <a
-                    className="nav-link collapsed"
-                    href="#"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#pagesCollapseError"
-                    aria-expanded="false"
-                    aria-controls="pagesCollapseError"
-                  >
-                    Error
-                    <div className="sb-sidenav-collapse-arrow">
-                      <i className="fas fa-angle-down"></i>
-                    </div>
-                  </a>
-                  <div
-                    className="collapse"
-                    id="pagesCollapseError"
-                    aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordionPages"
-                  >
-                    <nav className="sb-sidenav-menu-nested nav">
-                      <a className="nav-link" href="401.html">
-                        401 Page
-                      </a>
-                      <a className="nav-link" href="404.html">
-                        404 Page
-                      </a>
-                      <a className="nav-link" href="500.html">
-                        500 Page
-                      </a>
-                    </nav>
-                  </div>
+                <nav className="sb-sidenav-menu-nested nav">
+                  {renderLinks(data.pageInformationNurses)}
                 </nav>
               </div>
-
-              <div className="sb-sidenav-menu-heading">Complementos</div>
-              {PageAddons}
+              {/* Dropdown para Empleados */}
+              <a
+                className="nav-link collapsed"
+                href="#"
+                data-bs-toggle="collapse"
+                data-bs-target="#InfoUsers"
+                aria-expanded="false"
+                aria-controls="InfoUsers"
+              >
+                Empleados
+                <div className="sb-sidenav-collapse-arrow">
+                  <i className="fas fa-angle-down text-success"></i>
+                </div>
+              </a>
+              <div
+                className="collapse"
+                id="InfoUsers"
+                aria-labelledby="headingThree"
+                data-bs-parent="#Information"
+              >
+                <nav className="sb-sidenav-menu-nested nav">
+                  {renderLinks(data.pageInformationUsers)}
+                </nav>
+              </div>
+            </nav>
+          </div>
+          {/* Dropdown para listado de insumos */}
+          <a
+            className="nav-link collapsed"
+            href="#"
+            data-bs-toggle="collapse"
+            data-bs-target="#Inputs"
+            aria-expanded="false"
+            aria-controls="collapseInputs"
+          >
+            <div className="sb-nav-link-icon">
+              <i className="fas fa-book-open text-success"></i>
             </div>
-          </div>
-          <div className="sb-sidenav-footer">
-            <div className="small">Iniciado sesión por:</div>
-            <span>Admin {authUser.firstName}</span>
-          </div>
-        </nav>
-      ) : isNurse ? (
-         <nav
-          className="sb-sidenav accordion sb-sidenav-dark"
-          id="sidenavAccordion"
-        >
-          <div className="sb-sidenav-menu">
-            <div className="nav">
-              <div className="sb-sidenav-menu-heading">Panel Principal</div>
-              {PageDashboard}
-              <div className="sb-sidenav-menu-heading">Interfaces</div>
-              {PageInterface}
-              <div className="sb-sidenav-menu-heading">Complementos</div>
-              {PageAddons}
+            Listado de insumos
+            <div className="sb-sidenav-collapse-arrow">
+              <i className="fas fa-angle-down text-success"></i>
             </div>
+          </a>
+          <div
+            className="collapse"
+            id="Inputs"
+            aria-labelledby="headingThree"
+            data-bs-parent="#sidenavAccordion"
+          >
+            <nav className="sb-sidenav-menu-nested nav">
+              {renderLinks(data.pageInputs)}
+            </nav>
           </div>
-          <div className="sb-sidenav-footer">
-            <div className="small">Iniciado sesión por:</div>
-            <span>
-              {authUser.firstName} {authUser.lastName}
-            </span>
-          </div>
-        </nav>
-      ) : (
-        <nav
-          className="sb-sidenav accordion sb-sidenav-dark"
-          id="sidenavAccordion"
-        >
-          <div className="sb-sidenav-menu">
-            <div className="nav">
-              <div className="sb-sidenav-menu-heading">Panel Principal</div>
-              {PageDashboard}
-              <div className="sb-sidenav-menu-heading">Interfaces</div>
-              {PageInterface}
-              <div className="sb-sidenav-menu-heading">Complementos</div>
-              {PageAddons}
-            </div>
-          </div>
-          <div className="sb-sidenav-footer">
-            <div className="small">Iniciado sesión por:</div>
-            <span>
-              {authUser.firstName} {authUser.lastName}
-            </span>
-          </div>
-        </nav>
-      )}
+          <div className="sb-sidenav-menu-heading text-danger">Complementos</div>
+          {renderLinks(data.pageAddons)}
+        </div>
+      </div>
+      <div className="sb-sidenav-footer">
+        <div className="small">Iniciado sesión por:</div>
+        <span className="text-info">Admin {authUser.firstName}</span>
+      </div>
+    </nav>
+  );
+  const renderNurseNav = () => (
+    <nav className="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+      <div className="sb-sidenav-menu">
+        <div className="nav">
+          <div className="sb-sidenav-menu-heading text-info">Panel Principal</div>
+          {renderLinks(data.pageDashboard)}
+          <div className="sb-sidenav-menu-heading text-success">Interfaces</div>
+          {renderLinks(data.pageInterface)}
+          <div className="sb-sidenav-menu-heading text-danger">Complementos</div>
+          {renderLinks(data.pageAddons)}
+        </div>
+      </div>
+      <div className="sb-sidenav-footer">
+        <div className="small">Iniciado sesión por:</div>
+        <span className="text-info">
+          {authUser.firstName} {authUser.lastName}
+        </span>
+      </div>
+    </nav>
+  );
+  const renderUserNav = () => (
+    <nav className="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+      <div className="sb-sidenav-menu">
+        <div className="nav">
+          <div className="sb-sidenav-menu-heading text-info">Panel Principal</div>
+          {renderLinks(data.pageDashboard)}
+          <div className="sb-sidenav-menu-heading text-success">Interfaces</div>
+          {renderLinks(data.pageInterface)}
+          <div className="sb-sidenav-menu-heading text-danger">Complementos</div>
+          {renderLinks(data.pageAddons)}
+        </div>
+      </div>
+      <div className="sb-sidenav-footer">
+        <div className="small">Iniciado sesión por:</div>
+        <span className="text-info">
+          {authUser.firstName} {authUser.lastName}
+        </span>
+      </div>
+    </nav>
+  );
+  return (
+    <>
+      {isAdmin && renderAdminNav()}
+      {isNurse && renderNurseNav()}
+      {!isAdmin && !isNurse && renderUserNav()}
     </>
   );
 }

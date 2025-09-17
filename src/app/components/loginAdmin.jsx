@@ -19,9 +19,9 @@ export default function LoginAdminComponent(params) {
       <main>
         <div className="container px-2">
           <div className="row justify-content-center">
-            <div className="col-lg-6">
-              <div className="card bg-dark mt-2 mb-2">
-                <div className="card-header text-success">
+            <div className="col-lg-5">
+              <div className="card border-dark mt-2 mb-2">
+                <div className="card-header">
                   <i className="fas fa-user fa-fw me-1"></i>
                   Admin Hospital Metropolitano
                 </div>
@@ -29,7 +29,7 @@ export default function LoginAdminComponent(params) {
                   <form action={action}>
                     <div className="form-floating mb-2">
                       <input
-                        className="form-control"
+                        className="form-control border-info"
                         id="inputEmail"
                         type="email"
                         name="email"
@@ -48,7 +48,7 @@ export default function LoginAdminComponent(params) {
                     </div>
                     <div className="form-floating mb-2">
                       <input
-                        className="form-control"
+                        className="form-control border-info"
                         id="inputPassword"
                         type="password"
                         name="password"
@@ -68,7 +68,7 @@ export default function LoginAdminComponent(params) {
                       <div className="d-grid">
                         <button
                           disabled={isPending}
-                          className="btn btn-outline-primary"
+                          className="btn btn-primary"
                         >
                           {isPending ? (
                             <div
@@ -80,7 +80,7 @@ export default function LoginAdminComponent(params) {
                               </span>
                             </div>
                           ) : (
-                            "Login"
+                            "Iniciar sesión"
                           )}
                         </button>
                       </div>

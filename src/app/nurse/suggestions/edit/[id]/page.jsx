@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 
 export default async function editNurseSuggestion({ params }) {
   const { id } = await params;
-  const user = await getAuthUser()
+  const user = await getAuthUser();
 
   const suggestionCollection = await getCollection("suggestions");
   let suggestion;
@@ -17,7 +17,7 @@ export default async function editNurseSuggestion({ params }) {
     });
     suggestion = JSON.parse(JSON.stringify(suggestion));
     if (user.userId !== suggestion.userId) {
-        redirect("/nurse/suggestions")
+      redirect("/nurse/suggestions");
     }
   } else {
     suggestion = null;
@@ -28,14 +28,17 @@ export default async function editNurseSuggestion({ params }) {
       <div id="layoutAuthentication_content">
         <main>
           <div className="container px-2">
-            <div className="card bg-dark mt-2 mb-2">
+            <div className="card border-success mt-2 mb-2">
               <div className="card-header">
-                <h3 className="text-center font-weight-light my-2">
-                  Editar Sugerencia - Comentario
-                </h3>
+                <i className="fas fa-book-open me-1"></i>
+                Editar Sugerencia - Comentario
               </div>
               {suggestion ? (
-                <SuggestionFormComponent handler={editNursePost} suggestion={suggestion} isNurse={true} />
+                <SuggestionFormComponent
+                  handler={editNursePost}
+                  suggestion={suggestion}
+                  isNurse={true}
+                />
               ) : (
                 <p>Failed to fetch the data</p>
               )}

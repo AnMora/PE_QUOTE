@@ -20,9 +20,9 @@ export default function LoginNurseComponent(params) {
       <main>
         <div className="container px-2">
           <div className="row justify-content-center">
-            <div className="col-lg-6">
-              <div className="card bg-dark mt-2 mb-2">
-                <div className="card-header text-success">
+            <div className="col-lg-5">
+              <div className="card border-danger mt-2 mb-2">
+                <div className="card-header">
                   <i className="fas fa-user fa-fw me-1"></i>
                   Enfermería Hospital Metropolitano
                 </div>
@@ -30,7 +30,7 @@ export default function LoginNurseComponent(params) {
                   <form action={action}>
                     <div className="form-floating mb-2">
                       <input
-                        className="form-control"
+                        className="form-control border-info"
                         id="inputEmail"
                         type="email"
                         name="email"
@@ -49,7 +49,7 @@ export default function LoginNurseComponent(params) {
                     </div>
                     <div className="form-floating mb-2">
                       <input
-                        className="form-control"
+                        className="form-control border-info"
                         id="inputPassword"
                         type="password"
                         name="password"
@@ -69,7 +69,7 @@ export default function LoginNurseComponent(params) {
                       <div className="d-grid">
                         <button
                           disabled={isPending}
-                          className="btn btn-outline-primary"
+                          className="btn btn-primary"
                         >
                           {isPending ? (
                             <div
@@ -81,18 +81,18 @@ export default function LoginNurseComponent(params) {
                               </span>
                             </div>
                           ) : (
-                            "Login"
+                            "Iniciar sesión"
                           )}
                         </button>
                       </div>
                     </div>
                   </form>
                 </div>
-                <div className="card-footer">
+                <div className="card-footer bg-danger">
                   <div className="d-flex align-items-center justify-content-between">
                     <p className="pt-2">¿Eres de admisión?</p>
                     <Link className="nav-link" href="/">
-                      <button className="btn btn-outline-danger">
+                      <button className="btn btn-success">
                         Ir para admisión
                       </button>
                     </Link>

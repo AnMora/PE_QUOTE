@@ -1,5 +1,5 @@
 import getAuthUser from "@/lib/getAuthUser";
-import dataUser from "../../Utils/dataAdmin";
+import dataUser from "@/app/Utils/dataAdmin";
 
 import NavComponent from "@/app/components/nav";
 import NavLinkComponent from "@/app/components/navLink";
@@ -8,7 +8,7 @@ import ErrNoAuth from "@/app/components/401Error";
 import { getCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export default async function RegisterLayoutAdmin({ children }) {
+export default async function InputsLayoutAdmin({ children }) {
   const authUser = await getAuthUser();  
   const authUserId = authUser.userId;
   const userCollection = await getCollection("admin");
@@ -31,10 +31,10 @@ export default async function RegisterLayoutAdmin({ children }) {
     <>
       {authUserId ? (
         <div className="sb-nav-fixed">
-          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} />
+          <NavComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} isNurse={false} />
           <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} />
+              <NavLinkComponent dataUser={dataUser} authUser={sanitizedUser} isAdmin={true} isNurse={false} />
             </div>
             <div id="layoutSidenav_content">
               <main>

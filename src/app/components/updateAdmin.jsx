@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState } from "react";
-import { registerNurse } from "../actions/auth";
+import { updateAdmin } from "../actions/auth"; // Necesitarás crear esta Server Action
 
-export default function RegisterNurseComponent(params) {
-  const [state, action, isPending] = useActionState(registerNurse, undefined);
+export default function UpdateAdminComponent({ admin }) {
+  // Pasamos el ID del admin a la acción del servidor
+  const updateAdminWithId = updateAdmin.bind(null, admin._id);
+  const [state, action, isPending] = useActionState(updateAdminWithId, undefined);
 
   return (
     <div id="layoutAuthentication_content">
@@ -13,10 +14,10 @@ export default function RegisterNurseComponent(params) {
         <div className="container px-2">
           <div className="row justify-content-center">
             <div className="col-lg-8">
-              <div className="card border-danger mt-2 mb-2">
+              <div className="card border-dark mt-2 mb-2">
                 <div className="card-header">
-                  <i className="fas fa-user fa-fw me-1"></i>
-                  Crear enfermero Hospital Metropolitano
+                  <i className="fas fa-user-edit fa-fw me-1"></i>
+                  Actualizar datos de: {admin.firstName} {admin.lastName}
                 </div>
                 <div className="card-body">
                   <form action={action}>
@@ -29,14 +30,11 @@ export default function RegisterNurseComponent(params) {
                             type="text"
                             name="firstName"
                             placeholder="Enter your first name"
-                            defaultValue={state?.firstName}
+                            defaultValue={state?.firstName ?? admin.firstName}
                           />
                           <label htmlFor="inputFirstName">Nombre</label>
                           {state?.errors?.firstName && (
-                            <small
-                              id="emailHelp"
-                              className="form-text text-warning"
-                            >
+                            <small className="form-text text-warning">
                               {state.errors.firstName}
                             </small>
                           )}
@@ -50,14 +48,11 @@ export default function RegisterNurseComponent(params) {
                             type="text"
                             name="lastName"
                             placeholder="Enter your last name"
-                            defaultValue={state?.lastName}
+                            defaultValue={state?.lastName ?? admin.lastName}
                           />
                           <label htmlFor="inputLastName">Apellidos</label>
                           {state?.errors?.lastName && (
-                            <small
-                              id="emailHelp"
-                              className="form-text text-warning"
-                            >
+                            <small className="form-text text-warning">
                               {state.errors.lastName}
                             </small>
                           )}
@@ -71,15 +66,16 @@ export default function RegisterNurseComponent(params) {
                         type="email"
                         name="email"
                         placeholder="name@example.com"
-                        defaultValue={state?.email}
+                        defaultValue={state?.email ?? admin.email}
                       />
                       <label htmlFor="inputEmail">Correo Electrónico</label>
                       {state?.errors?.email && (
-                        <small id="emailHelp" className="form-text text-warning">
+                        <small className="form-text text-warning">
                           {state.errors.email}
                         </small>
                       )}
                     </div>
+                    <p className="small text-muted">Deje los campos de contraseña en blanco si no desea cambiarla.</p>
                     <div className="row mb-3">
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
@@ -90,12 +86,9 @@ export default function RegisterNurseComponent(params) {
                             name="password"
                             placeholder="Create a password"
                           />
-                          <label htmlFor="inputPassword">Contraseña</label>
+                          <label htmlFor="inputPassword">Nueva Contraseña</label>
                           {state?.errors?.password && (
-                            <small
-                              id="emailHelp"
-                              className="form-text text-warning"
-                            >
+                            <small className="form-text text-warning">
                               <p className="text-warning">La contraseña debe:</p>
                               <ul className="small text-warning">
                                 {state.errors.password.map((err) => (
@@ -116,13 +109,10 @@ export default function RegisterNurseComponent(params) {
                             placeholder="Confirm password"
                           />
                           <label htmlFor="inputPasswordConfirm">
-                            Confirmar Contraseña
+                            Confirmar Nueva Contraseña
                           </label>
                           {state?.errors?.confirmPassword && (
-                            <small
-                              id="emailHelp"
-                              className="form-text text-warning"
-                            >
+                            <small className="form-text text-warning">
                               {state.errors.confirmPassword}
                             </small>
                           )}
@@ -136,10 +126,13 @@ export default function RegisterNurseComponent(params) {
                           className="btn btn-primary btn-block"
                         >
                           {isPending ? (
-                            <div className="spinner-border spinner-border-sm" role="status">
+                            <div
+                              className="spinner-border spinner-border-sm"
+                              role="status"
+                            >
                               <span className="visually-hidden">Loading...</span>
                             </div>
-                          ) : "Crear cuenta"}
+                          ) : "Actualizar Cuenta"}
                         </button>
                       </div>
                     </div>

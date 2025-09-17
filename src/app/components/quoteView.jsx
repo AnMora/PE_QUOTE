@@ -2,6 +2,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import React, { useEffect, useState, useMemo } from "react";
+
 export default function QuoteView({ inputs, authUser, isNurse }) {
   const [patient, setPatient] = useState("");
   const [dayOfBirth, setDayOfBirth] = useState("");
@@ -30,8 +31,10 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
   }, []);
   useEffect(() => {
     const filteredInsumos = inputs.filter((insumo) => {
-      const numeroDelArticulo = insumo.numeroDelArticulo?.toLowerCase().trim() || "";
-      const descripcionDelArticulo = insumo.descripcionDelArticulo?.toLowerCase().trim() || "";
+      const numeroDelArticulo =
+        insumo.numeroDelArticulo?.toLowerCase().trim() || "";
+      const descripcionDelArticulo =
+        insumo.descripcionDelArticulo?.toLowerCase().trim() || "";
       return (
         numeroDelArticulo.includes(terminoBusqueda.toLowerCase().trim()) ||
         descripcionDelArticulo.includes(terminoBusqueda.toLowerCase().trim())
@@ -44,7 +47,8 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
     const totalSinImpuesto = seleccionados.reduce((acc, insumo) => {
       const precio = insumo.pacIntCOL
         ? typeof insumo.pacIntCOL === "string"
-          ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) || 0
+          ? parseFloat(insumo.pacIntCOL.replace(/\s/g, "").replace(",", ".")) ||
+            0
           : parseFloat(insumo.pacIntCOL) || 0
         : 0;
       return acc + precio * (insumo.cantidad || 1);
@@ -65,7 +69,17 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
       totalConSeguroSinImpuesto,
     };
   };
-  const generarPDF = (doc, datosPaciente, diagnostico, seleccionados, totals, requiereSeguro, porcentajeAPagar, authUser, patient) => {
+  const generarPDF = (
+    doc,
+    datosPaciente,
+    diagnostico,
+    seleccionados,
+    totals,
+    requiereSeguro,
+    porcentajeAPagar,
+    authUser,
+    patient
+  ) => {
     // Datos del paciente
     autoTable(doc, {
       head: [["Datos de Paciente", ""]],
@@ -147,7 +161,11 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
     if (requiereSeguro) {
       const seguroDetails = [
         ["Porcentaje a Pagar (%)", "", `${porcentajeAPagar}%`],
-        ["Total Seguro Con impuesto", "", `${totals.totalConSeguro.toFixed(2)}`],
+        [
+          "Total Seguro Con impuesto",
+          "",
+          `${totals.totalConSeguro.toFixed(2)}`,
+        ],
         [
           "Total Seguro Sin impuesto",
           "",
@@ -196,7 +214,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
   useEffect(() => {
     localStorage.setItem("insumosSeleccionados", JSON.stringify(seleccionados));
   }, [seleccionados]);
-  
+
   const agregarInsumo = (insumo) => {
     const insumoConCantidad = { ...insumo, cantidad: 1 }; // Establecer cantidad por defecto en 1
     setSeleccionados((prev) => [...prev, insumoConCantidad]);
@@ -226,7 +244,11 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
       });
       return;
     }
-    const totals = calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar);
+    const totals = calcularTotales(
+      seleccionados,
+      requiereSeguro,
+      porcentajeAPagar
+    );
     const doc = new jsPDF("landscape");
     const datosPaciente = [
       ["Paciente", patient],
@@ -234,9 +256,19 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
       ["Correo Electrónico", email],
     ];
     const diagnostico = [["Diagnóstico", diagnostic]];
-    generarPDF(doc, datosPaciente, diagnostico, seleccionados, totals, requiereSeguro, porcentajeAPagar, authUser, patient);
+    generarPDF(
+      doc,
+      datosPaciente,
+      diagnostico,
+      seleccionados,
+      totals,
+      requiereSeguro,
+      porcentajeAPagar,
+      authUser,
+      patient
+    );
   };
-  
+
   const indexOfLastInsumo = paginaActual * insumosPorPagina;
   const indexOfFirstInsumo = indexOfLastInsumo - insumosPorPagina;
   const insumosActuales = insumosFiltrados.slice(
@@ -268,9 +300,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
       pages.push(
         <li
           key={i}
-          className={`page-item text-dark ${
-            paginaActual === i ? "active" : ""
-          }`}
+          className={`page-item ${paginaActual === i ? "bg-info" : ""}`}
         >
           <button
             type="button"
@@ -291,11 +321,11 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
     }
     return pages;
   };
-  
+
   return (
     <form onSubmit={handleSubmit}>
-      <div className="card bg-dark mt-2 mb-2">
-        <div className="card-header text-success">
+      <div className="card border-info mt-2 mb-2">
+        <div className="card-header">
           <i className="fas fa-user fa-fw me-1"></i>
           Datos de paciente
         </div>
@@ -305,7 +335,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="col-md-6">
               <div className="form-floating mb-3 mb-md-0">
                 <input
-                  className="form-control bg-dark text-info border-info"
+                  className="form-control border-info"
                   id="inputFirstName"
                   type="text"
                   name="patient"
@@ -318,7 +348,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="col-md-6">
               <div className="form-floating">
                 <input
-                  className="form-control bg-dark text-info border-info"
+                  className="form-control border-info"
                   id="inputLastName"
                   type="text"
                   name="dayOfBirth"
@@ -333,7 +363,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="col-md-6">
               <div className="form-floating mb-3 mb-md-0">
                 <input
-                  className="form-control bg-dark text-info border-info"
+                  className="form-control border-info"
                   id="inputFirstName"
                   type="text"
                   name="emailAddress"
@@ -346,7 +376,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="col-md-6">
               <div className="form-floating">
                 <input
-                  className="form-control bg-dark text-info border-info"
+                  className="form-control border-info"
                   id="inputLastName"
                   type="text"
                   name="patientDiagnostic"
@@ -359,8 +389,8 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
           </div>
         </div>
       </div>
-      <div className="card bg-dark mt-2 mb-2">
-        <div className="card-header text-success">
+      <div className="card border-success mt-2 mb-2">
+        <div className="card-header">
           <i className="fas fa-columns me-1"></i>
           Insumos disponibles
         </div>
@@ -369,14 +399,14 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="input-group">
               <input
                 type="text"
-                className="form-control bg-dark text-info border-info"
+                className="form-control border-info"
                 id="buscador"
                 placeholder="Buscar insumos..."
                 value={terminoBusqueda}
                 onChange={(e) => setTerminoBusqueda(e.target.value)}
               />
               <button
-                className="btn btn-primary"
+                className="btn btn-info"
                 id="btnNavbarSearch"
                 type="button"
               >
@@ -385,16 +415,16 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             </div>
           </div>
           {isNurse ? (
-            <table className="table table-hover table-bordered">
-              <thead>
-                <tr className="table-dark">
+            <table className="table table-bordered table-hover">
+              <thead className="table-success">
+                <tr>
                   <th scope="col">Numero del Artículo</th>
                   <th scope="col">Descripción del Artículo</th>
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
-              <tfoot>
-                <tr className="table-dark">
+              <tfoot className="table-success">
+                <tr>
                   <th scope="col">Numero del Artículo</th>
                   <th scope="col">Descripción del Artículo</th>
                   <th scope="col">Acciones</th>
@@ -402,13 +432,15 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
               </tfoot>
               <tbody>
                 {insumosActuales.map((insumo) => (
-                  <tr className="table-dark" key={insumo.id}>
-                    <td>{insumo.numeroDelArticulo}</td>
-                    <td>{insumo.descripcionDelArticulo}</td>
+                  <tr key={insumo.id}>
+                    <td className="text-white">{insumo.numeroDelArticulo}</td>
+                    <td className="text-white">
+                      {insumo.descripcionDelArticulo}
+                    </td>
                     <td>
                       <button
                         type="button"
-                        className="btn btn-outline-success"
+                        className="btn btn-success"
                         onClick={() => agregarInsumo(insumo)}
                       >
                         Agregar
@@ -419,9 +451,9 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
               </tbody>
             </table>
           ) : (
-            <table className="table table-hover table-bordered">
-              <thead>
-                <tr className="table-dark">
+            <table className="table table-bordered table-hover">
+              <thead className="table-success">
+                <tr>
                   <th scope="col">Numero del Artículo</th>
                   <th scope="col">Descripción del Artículo</th>
                   <th scope="col">Precio Ext (COL)</th>
@@ -429,8 +461,8 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
-              <tfoot>
-                <tr className="table-dark">
+              <tfoot className="table-success">
+                <tr>
                   <th scope="col">Numero del Artículo</th>
                   <th scope="col">Descripción del Artículo</th>
                   <th scope="col">Precio Ext (COL)</th>
@@ -440,15 +472,17 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
               </tfoot>
               <tbody>
                 {insumosActuales.map((insumo) => (
-                  <tr className="table-dark" key={insumo.id}>
-                    <td>{insumo.numeroDelArticulo}</td>
-                    <td>{insumo.descripcionDelArticulo}</td>
-                    <td>{insumo.pacExtCOL}</td>
+                  <tr key={insumo.id}>
+                    <td className="text-white">{insumo.numeroDelArticulo}</td>
+                    <td className="text-white">
+                      {insumo.descripcionDelArticulo}
+                    </td>
+                    <td className="text-white">{insumo.pacExtCOL}</td>
                     <td className="text-warning">{insumo.pacIntCOL}</td>
-                    <td>
+                    <td className="text-white">
                       <button
                         type="button"
-                        className="btn btn-outline-success"
+                        className="btn btn-success"
                         onClick={() => agregarInsumo(insumo)}
                       >
                         Agregar
@@ -461,7 +495,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
           )}
         </div>
         <div style={paginationStyle} className="card-footer">
-          <ul className="pagination">
+          <ul className="pagination pagination-lg">
             <li className={`page-item ${paginaActual === 1 ? "disabled" : ""}`}>
               <button
                 type="button"
@@ -477,12 +511,12 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             {renderPagination()}
             <li
               className={`page-item ${
-                paginaActual === totalPaginas ? "disabled" : ""
+                paginaActual === totalPaginas ? "disabled" : "active"
               }`}
             >
               <button
                 type="button"
-                className="page-link"
+                className="page-link bg-info"
                 onClick={() =>
                   setPaginaActual(
                     paginaActual < totalPaginas
@@ -498,8 +532,8 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
           </ul>
         </div>
       </div>
-      <div className="card bg-dark mt-2 mb-2">
-        <div className="card-header text-success">
+      <div className="card border-danger mt-2 mb-2">
+        <div className="card-header">
           <i className="fas fa-columns me-1"></i>
           Insumos seleccionados
         </div>
@@ -508,9 +542,9 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="card-body">
               {seleccionados.length > 0 ? (
                 <div>
-                  <table className="table table-hover table-bordered">
+                  <table className="table table-bordered table-hover">
                     <thead>
-                      <tr className="table-dark">
+                      <tr className="table-success">
                         <th scope="col">Numero del Artículo</th>
                         <th scope="col">Descripción del Artículo</th>
                         <th scope="col">Cantidad</th>
@@ -519,12 +553,16 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                     </thead>
                     <tbody>
                       {seleccionados.map((insumo, index) => (
-                        <tr className="table-dark" key={index}>
-                          <td>{insumo.numeroDelArticulo}</td>
-                          <td>{insumo.descripcionDelArticulo}</td>
+                        <tr key={index}>
+                          <td className="text-white">
+                            {insumo.numeroDelArticulo}
+                          </td>
+                          <td className="text-white">
+                            {insumo.descripcionDelArticulo}
+                          </td>
                           <td>
                             <input
-                              className="bg-dark text-info border-info"
+                              className="text-info border-info"
                               type="number"
                               value={insumo.cantidad || 1}
                               min={1}
@@ -546,7 +584,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                           <td>
                             <button
                               type="button"
-                              className="btn btn-outline-danger"
+                              className="btn btn-warning"
                               onClick={() => eliminarInsumo(index)}
                             >
                               Eliminar
@@ -569,14 +607,14 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
               )}
               <button
                 type="submit"
-                className="btn btn-outline-primary mt-2 mb-2 m-1"
+                className="btn btn-success mt-2 mb-2 m-1"
                 disabled={seleccionados.length === 0}
               >
                 Compartir insumos
               </button>
               <button
                 type="button"
-                className="btn btn-outline-danger mt-2 mb-2 m-1"
+                className="btn btn-warning mt-2 mb-2 m-1"
                 onClick={limpiarSeleccionados}
               >
                 Limpiar Seleccionados
@@ -588,9 +626,9 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
             <div className="card-body">
               {seleccionados.length > 0 ? (
                 <div>
-                  <table className="table table-hover table-bordered">
+                  <table className="table table-bordered table-hover">
                     <thead>
-                      <tr className="table-dark">
+                      <tr className="table-success">
                         <th scope="col">Numero del Artículo</th>
                         <th scope="col">Descripción del Artículo</th>
                         <th scope="col">Precio Int (COL)</th>
@@ -599,52 +637,62 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                       </tr>
                     </thead>
                     <tfoot>
-                      <tr className="table-dark">
-                        <th colSpan="2" className="text-end">
+                      <tr>
+                        <th colSpan="2" className="text-white text-end">
                           Costos Totales
                         </th>
-                        <th colSpan="3" className="text-end">
+                        <th colSpan="3" className="text-white text-end">
                           Montos Totales
                         </th>
                       </tr>
-                      <tr className="table-dark">
-                        <td colSpan="2" className="text-end">
+                      <tr>
+                        <td colSpan="2" className="text-white text-end">
                           Total con Impuesto (4%):
                         </td>
-                        <td colSpan="3" className="text-end text-warning">
-                          {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalConImpuesto.toFixed(2)}
+                        <td colSpan="3" className="text-white text-end">
+                          {calcularTotales(
+                            seleccionados,
+                            requiereSeguro,
+                            porcentajeAPagar
+                          ).totalConImpuesto.toFixed(2)}
                         </td>
                       </tr>
-                      <tr className="table-dark">
-                        <td colSpan="2" className="text-end">
+                      <tr>
+                        <td colSpan="2" className="text-white text-end">
                           Total sin Impuesto:
                         </td>
-                        <td colSpan="3" className="text-end text-warning">
-                          {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalSinImpuesto.toFixed(2)}
+                        <td colSpan="3" className="text-white text-end">
+                          {calcularTotales(
+                            seleccionados,
+                            requiereSeguro,
+                            porcentajeAPagar
+                          ).totalSinImpuesto.toFixed(2)}
                         </td>
                       </tr>
-                      <tr className="table-dark">
-                        <td colSpan="2" className="text-end">
+                      <tr>
+                        <td colSpan="2" className="text-white text-end">
                           Requiere seguro
                         </td>
-                        <td colSpan="3" className="text-end text-warning">
+                        <td colSpan="3" className="text-end">
                           <input
                             className="form-check-input"
                             type="checkbox"
                             checked={requiereSeguro}
-                            onChange={(e) => setRequiereSeguro(e.target.checked)}
+                            onChange={(e) =>
+                              setRequiereSeguro(e.target.checked)
+                            }
                           />
                         </td>
                       </tr>
                       {requiereSeguro && (
                         <>
-                          <tr className="table-dark">
-                            <td colSpan="2" className="text-end">
+                          <tr>
+                            <td colSpan="2" className="text-white text-end">
                               Porcentaje a Pagar (%):
                             </td>
                             <td colSpan="3">
                               <input
-                                className="form-control bg-dark text-info border-info text-end"
+                                className="form-control border-info text-end"
                                 type="text"
                                 id="porcentajeAPagar"
                                 value={porcentajeAPagar}
@@ -656,20 +704,28 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                               />
                             </td>
                           </tr>
-                          <tr className="table-dark">
-                            <td colSpan="2" className="text-end">
+                          <tr>
+                            <td colSpan="2" className="text-white text-end">
                               Total Seguro con Impuesto:
                             </td>
-                            <td colSpan="3" className="text-end text-warning">
-                              {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalConSeguro.toFixed(2)}
+                            <td colSpan="3" className="text-white text-end">
+                              {calcularTotales(
+                                seleccionados,
+                                requiereSeguro,
+                                porcentajeAPagar
+                              ).totalConSeguro.toFixed(2)}
                             </td>
                           </tr>
-                          <tr className="table-dark">
-                            <td colSpan="2" className="text-end">
+                          <tr>
+                            <td colSpan="2" className="text-white text-end">
                               Total Seguro sin Impuesto:
                             </td>
-                            <td colSpan="3" className="text-end text-warning">
-                              {calcularTotales(seleccionados, requiereSeguro, porcentajeAPagar).totalConSeguroSinImpuesto.toFixed(2)}
+                            <td colSpan="3" className="text-white text-end">
+                              {calcularTotales(
+                                seleccionados,
+                                requiereSeguro,
+                                porcentajeAPagar
+                              ).totalConSeguroSinImpuesto.toFixed(2)}
                             </td>
                           </tr>
                         </>
@@ -677,13 +733,17 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                     </tfoot>
                     <tbody>
                       {seleccionados.map((insumo, index) => (
-                        <tr className="table-dark" key={index}>
-                          <td>{insumo.numeroDelArticulo}</td>
-                          <td>{insumo.descripcionDelArticulo}</td>
-                          <td className="text-warning">{insumo.pacIntCOL}</td>
+                        <tr key={index}>
+                          <td className="text-white">
+                            {insumo.numeroDelArticulo}
+                          </td>
+                          <td className="text-white">
+                            {insumo.descripcionDelArticulo}
+                          </td>
+                          <td className="text-white">{insumo.pacIntCOL}</td>
                           <td>
                             <input
-                              className="bg-dark text-info border-info"
+                              className="text-info border-info"
                               type="number"
                               value={insumo.cantidad || 1}
                               min={1}
@@ -705,7 +765,7 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
                           <td>
                             <button
                               type="button"
-                              className="btn btn-outline-danger"
+                              className="btn btn-warning"
                               onClick={() => eliminarInsumo(index)}
                             >
                               Eliminar
@@ -728,14 +788,14 @@ export default function QuoteView({ inputs, authUser, isNurse }) {
               )}
               <button
                 type="submit"
-                className="btn btn-outline-primary mt-2 mb-2 m-1"
+                className="btn btn-success mt-2 mb-2 m-1"
                 disabled={seleccionados.length === 0}
               >
                 Generar PDF
               </button>
               <button
                 type="button"
-                className="btn btn-outline-danger mt-2 mb-2 m-1"
+                className="btn btn-warning mt-2 mb-2 m-1"
                 onClick={limpiarSeleccionados}
               >
                 Limpiar Seleccionados

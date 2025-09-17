@@ -6,11 +6,11 @@ import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 
 export default async function editSuggestion({ params }) {
-    // ** ID PARAMETER FROM PAGE PARAMS
+  // ** ID PARAMETER FROM PAGE PARAMS
   const { id } = await params;
 
-    // ** GET AUTH USER FROM COOKIES
-    const user = await getAuthUser()
+  // ** GET AUTH USER FROM COOKIES
+  const user = await getAuthUser();
 
   const suggestionCollection = await getCollection("suggestions");
   let suggestion;
@@ -20,7 +20,7 @@ export default async function editSuggestion({ params }) {
     });
     suggestion = JSON.parse(JSON.stringify(suggestion));
     if (user.userId !== suggestion.userId) {
-        redirect("/suggestions")
+      redirect("/suggestions");
     }
   } else {
     suggestion = null;
@@ -31,14 +31,17 @@ export default async function editSuggestion({ params }) {
       <div id="layoutAuthentication_content">
         <main>
           <div className="container px-2">
-            <div className="card bg-dark mt-2 mb-2">
+            <div className="card border-success mt-2 mb-2">
               <div className="card-header">
-                <h3 className="text-center font-weight-light my-2">
-                  Editar Sugerencia - Comentario
-                </h3>
+                <i className="fas fa-book-open me-1"></i>
+                Editar Sugerencia - Comentario
               </div>
               {suggestion ? (
-                <SuggestionFormComponent handler={editPost} suggestion={suggestion} isNurse={false} />
+                <SuggestionFormComponent
+                  handler={editPost}
+                  suggestion={suggestion}
+                  isNurse={false}
+                />
               ) : (
                 <p>Failed to fetch the data</p>
               )}

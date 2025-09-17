@@ -6,7 +6,7 @@ import FooterComponent from "./components/footer";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <link
           href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"

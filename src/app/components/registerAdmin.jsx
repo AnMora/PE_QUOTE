@@ -12,8 +12,8 @@ export default function RegisterAdminComponent(params) {
         <div className="container px-2">
           <div className="row justify-content-center">
             <div className="col-lg-8">
-            <div className="card bg-dark mt-2 mb-2">
-                <div className="card-header text-success">
+            <div className="card border-dark mt-2 mb-2">
+                <div className="card-header">
                   <i className="fas fa-user fa-fw me-1"></i>
                   Crear administrador Hospital Metropolitano
                 </div>
@@ -23,7 +23,7 @@ export default function RegisterAdminComponent(params) {
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
                           <input
-                            className="form-control"
+                            className="form-control border-info"
                             id="inputFirstName"
                             type="text"
                             name="firstName"
@@ -44,7 +44,7 @@ export default function RegisterAdminComponent(params) {
                       <div className="col-md-6">
                         <div className="form-floating">
                           <input
-                            className="form-control"
+                            className="form-control border-info"
                             id="inputLastName"
                             type="text"
                             name="lastName"
@@ -65,7 +65,7 @@ export default function RegisterAdminComponent(params) {
                     </div>
                     <div className="form-floating mb-3">
                       <input
-                        className="form-control"
+                        className="form-control border-info"
                         id="inputEmail"
                         type="email"
                         name="email"
@@ -83,7 +83,7 @@ export default function RegisterAdminComponent(params) {
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
                           <input
-                            className="form-control"
+                            className="form-control border-info"
                             id="inputPassword"
                             type="password"
                             name="password"
@@ -108,7 +108,7 @@ export default function RegisterAdminComponent(params) {
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
                           <input
-                            className="form-control"
+                            className="form-control border-info"
                             id="inputPasswordConfirm"
                             type="password"
                             name="confirmPassword"
@@ -132,7 +132,7 @@ export default function RegisterAdminComponent(params) {
                     <div className="d-grid">
                         <button
                           disabled={isPending}
-                          className="btn btn-outline-primary btn-block"
+                          className="btn btn-primary btn-block"
                         >
                           {isPending ? (
                             <div className="spinner-border spinner-border-sm" role="status">

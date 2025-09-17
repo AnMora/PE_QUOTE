@@ -8,8 +8,8 @@ export default async function createSuggestion(params) {
       <div id="layoutAuthentication_content">
         <main>
           <div className="container px-2">
-            <div className="card bg-dark mt-2 mb-2">
-              <div className="card-header text-success">
+            <div className="card border-success mt-2 mb-2">
+              <div className="card-header">
                 <i className="fas fa-book-open me-1"></i>
                 Crear sugerencias - comentarios
               </div>

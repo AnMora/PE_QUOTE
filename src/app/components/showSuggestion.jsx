@@ -10,13 +10,13 @@ export default async function ShowSuggestion({ suggestion, isNurse }) {
     <div id="layoutAuthentication_content">
       <main>
         <div className="container px-2">
-          <div className="card bg-dark mt-2 mb-2">
+          <div className="card border-info mt-2 mb-2">
             <div className="card-header">
-              <div className="text-primary">{suggestion.title}</div>
+              <div>{suggestion.title}</div>
               <span className="badge bg-warning rounded-pill me-1">
                 {suggestion._id.getTimestamp().toLocaleString()}
               </span>
-              <span className="badge bg-info rounded-pill me-1">
+              <span className="badge bg-primary rounded-pill me-1">
                 {suggestion.userFirstName} {suggestion.userLastName}
               </span>
             </div>
@@ -38,7 +38,7 @@ export default async function ShowSuggestion({ suggestion, isNurse }) {
                   <Link
                     href={`/nurse/suggestions/edit/${suggestion._id.toString()}`}
                   >
-                    <button className="btn btn-outline-info m-1">Editar</button>
+                    <button className="btn btn-info m-1">Editar</button>
                   </Link>
                   <form action={deleteNursePost}>
                   <input
@@ -48,7 +48,7 @@ export default async function ShowSuggestion({ suggestion, isNurse }) {
                   />
                   <button
                     type="submit"
-                    className="btn btn-outline-danger m-1"
+                    className="btn btn-warning m-1"
                     href="#"
                   >
                     Eliminar
@@ -58,7 +58,7 @@ export default async function ShowSuggestion({ suggestion, isNurse }) {
                 ) : (
                   <>
                   <Link href={`/suggestions/edit/${suggestion._id.toString()}`}>
-                    <button className="btn btn-outline-info m-1">Editar</button>
+                    <button className="btn btn-info m-1">Editar</button>
                   </Link>
                   <form action={deletePost}>
                   <input
@@ -68,7 +68,7 @@ export default async function ShowSuggestion({ suggestion, isNurse }) {
                   />
                   <button
                     type="submit"
-                    className="btn btn-outline-danger m-1"
+                    className="btn btn-warning m-1"
                     href="#"
                   >
                     Eliminar
@@ -82,13 +82,13 @@ export default async function ShowSuggestion({ suggestion, isNurse }) {
                 {/* PASAR VALIDACION DE URL isNurse ? hacer : hacer */}
                 {isNurse ? (
                   <Link href="/nurse/suggestions">
-                    <button className="btn btn-outline-danger m-1">
+                    <button className="btn btn-danger m-1">
                       Volver
                     </button>
                   </Link>
                 ) : (
                   <Link href="/suggestions">
-                    <button className="btn btn-outline-danger m-1">
+                    <button className="btn btn-danger m-1">
                       Volver
                     </button>
                   </Link>

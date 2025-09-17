@@ -302,6 +302,7 @@ svg {
 }
 
 table {
+  border: 2px solid red;
   caption-side: bottom;
   border-collapse: collapse;
 }
@@ -6538,10 +6539,13 @@ textarea.form-control-lg {
 }
 
 .fixed-top, .sb-nav-fixed #layoutSidenav #layoutSidenav_nav, .sb-nav-fixed .sb-topnav {
+  /* Cambios */
+  border: 10px solid transparent;
+  border-radius: 0 0 20px 20px;
   position: fixed;
   top: 0;
-  right: 0;
-  left: 0;
+  right: 5px;
+  left: 5px;
   z-index: 1030;
 }
 
@@ -11382,11 +11386,11 @@ body {
 }
 .sb-nav-fixed #layoutSidenav #layoutSidenav_nav {
   width: 225px;
-  height: 100vh;
+  height: 93vh;
   z-index: 1038;
 }
 .sb-nav-fixed #layoutSidenav #layoutSidenav_nav .sb-sidenav {
-  padding-top: 56px;
+  margin-top: 50px;
 }
 .sb-nav-fixed #layoutSidenav #layoutSidenav_nav .sb-sidenav .sb-sidenav-menu {
   overflow-y: auto;
@@ -11481,6 +11485,10 @@ body {
 }
 
 .sb-sidenav-dark {
+  /* Cambios */
+  /* background-color: #212529; */
+  border: 10px solid transparent;
+  border-radius: 20px;
   background-color: #212529;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -11507,9 +11515,12 @@ body {
 }
 .sb-sidenav-dark .sb-sidenav-footer {
   background-color: #343a40;
+  border-radius: 0 0 10px 10px;
 }
 
 .sb-sidenav-light {
+  border: 10px solid transparent;
+  border-radius: 20px;
   background-color: #f8f9fa;
   color: #212529;
 }
@@ -11536,6 +11547,14 @@ body {
 }
 .sb-sidenav-light .sb-sidenav-footer {
   background-color: #e9ecef;
+  border-radius: 0 0 10px 10px;
+}
+
+.sb-sidefooter {
+  margin-left: 5px;
+  margin-right: 5px;
+  border: 10px solid transparent;
+  border-radius: 20px 20px 0 0 ;
 }
 
 .dataTable-wrapper .dataTable-container {

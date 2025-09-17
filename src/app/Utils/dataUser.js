@@ -3,31 +3,31 @@ const CUPPanelUser = {
     {
       path: "/dashboard",
       session: "Dashboard",
-      icon: "fas fa-tachometer-alt"
+      icon: "fas fa-tachometer-alt text-info"
     },
   ],
   pageInterface: [
     {
       path: "/quotes",
       session: "Cotizador",
-      icon: "fas fa-table"
+      icon: "fas fa-table text-success"
     },
     {
       path: "/suggestions",
       session: "Sugerencias",
-      icon: "fas fa-book-open"
+      icon: "fas fa-book-open text-success"
     },
   ],
   pageAddons: [
     {
       path: "/admin/assents",
       session: "Consentimientos",
-      icon: "fas fa-chart-area",
+      icon: "fas fa-chart-area text-danger",
     },
     {
       path: "/admin/formal",
       session: "Proformas",
-      icon: "fas fa-columns",
+      icon: "fas fa-columns text-danger",
     }
   ],
   generalInformation: {

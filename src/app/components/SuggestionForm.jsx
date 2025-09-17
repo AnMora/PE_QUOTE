@@ -17,7 +17,7 @@ export default function SuggestionFormComponent({ handler, suggestion, isNurse }
         />
         <div className="form-floating mb-3">
           <input
-            className="form-control"
+            className="form-control border-info"
             id="inputTitle"
             type="text"
             name="title"
@@ -26,13 +26,13 @@ export default function SuggestionFormComponent({ handler, suggestion, isNurse }
           />
           <label htmlFor="title">Sugerencia o comentario</label>
           {state?.errors?.title && (
-            <small className="form-text text-warning">{state.errors.title}</small>
+            <small className="form-text">{state.errors.title}</small>
           )}
         </div>
 
         <div className="form-floating mb-3">
           <textarea
-            className="form-control"
+            className="form-control border-info"
             id="inputTitle"
             type="text"
             name="description"
@@ -42,12 +42,12 @@ export default function SuggestionFormComponent({ handler, suggestion, isNurse }
           ></textarea>
           <label htmlFor="description">Descripción</label>
           {state?.errors?.description && (
-            <small className="form-text text-warning">{state.errors.description}</small>
+            <small className="form-text">{state.errors.description}</small>
           )}
         </div>
         <div className="mt-4 mb-0">
           <div className="d-grid">
-            <button disabled={isPending} className="btn btn-outline-primary">
+            <button disabled={isPending} className="btn btn-primary">
               {isPending ? (
                 <div className="spinner-border spinner-border-sm" role="status">
                   <span className="visually-hidden">Loading...</span>
