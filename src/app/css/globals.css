@@ -11476,6 +11476,7 @@ body {
   transform: rotate(-90deg);
 }
 .sb-sidenav .sb-sidenav-menu .nav .sb-sidenav-menu-nested {
+  background-color: #e9ecef;
   margin-left: 1.5rem;
   flex-direction: column;
 }

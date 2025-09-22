@@ -2,10 +2,12 @@
 
 import bcrypt from "bcrypt";
 import { getCollection } from "@/lib/db";
-import { RegisterFormSchema, LoginFormSchema } from "@/lib/rules";
+import { RegisterFormSchema, LoginFormSchema, EditFormSchema } from "@/lib/rules";
 import { redirect } from "next/navigation";
 import { createSession } from "@/lib/sessions";
 import { cookies } from "next/headers";
+import { ObjectId } from "mongodb";
+import { revalidatePath } from "next/cache";
 
 export async function register(state, formData) {
   // **VALIDATE FORM FIELDS
@@ -158,6 +160,225 @@ export async function registerAdmin(state, formData) {
 
   // **REDIRECT
   redirect("/admin/information/admins/show-admins");
+}
+
+export async function editAdmin(state, formData) {
+  // **EXTRACT FORM FIELDS
+  const id = formData.get("id");
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
+  const currentPassword = formData.get("currentPassword");
+
+  // **VALIDATE FORM FIELDS
+  const validatedFields = EditFormSchema.safeParse({
+    firstName,
+    lastName,
+    email,
+    password: password || undefined, // Hacemos la contraseña opcional en la validación
+    confirmPassword: confirmPassword || undefined,
+    currentPassword: currentPassword || undefined,
+  });
+
+  // **IF ANY FORM FIELDS ARE INVALID
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const adminCollection = await getCollection("admin");
+  if (!adminCollection) return { errors: { form: "Error de servidor!" } };
+
+  const updateData = {
+    firstName: validatedFields.data.firstName,
+    lastName: validatedFields.data.lastName,
+    email: validatedFields.data.email,
+  };
+
+  // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
+  if (validatedFields.data.password) {
+    // Primero, buscar al admin para verificar su contraseña actual
+    const admin = await adminCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+    if (!admin) {
+      return { errors: { form: "Administrador no encontrado." } };
+    }
+
+    // Verificar que la contraseña actual es correcta
+    const isCurrentPasswordValid = await bcrypt.compare(
+      validatedFields.data.currentPassword,
+      admin.password
+    );
+
+    if (!isCurrentPasswordValid) {
+      return {
+        errors: { currentPassword: "La contraseña actual no es correcta." },
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
+    updateData.password = hashedPassword;
+  }
+
+  try {
+    await adminCollection.updateOne(
+      { _id: ObjectId.createFromHexString(id) },
+      { $set: updateData }
+    );
+  } catch (error) {
+    return { errors: { form: "No se pudo actualizar el administrador." } };
+  }
+
+  revalidatePath("/admin/information/admins/show-admins");
+  redirect("/admin/information/admins/show-admins");
+}
+
+export async function editNurse(state, formData) {
+  // **EXTRACT FORM FIELDS
+  const id = formData.get("id");
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
+  const currentPassword = formData.get("currentPassword");
+
+  // **VALIDATE FORM FIELDS
+  const validatedFields = EditFormSchema.safeParse({
+    firstName,
+    lastName,
+    email,
+    password: password || undefined, // Hacemos la contraseña opcional en la validación
+    confirmPassword: confirmPassword || undefined,
+    currentPassword: currentPassword || undefined,
+  });
+
+  // **IF ANY FORM FIELDS ARE INVALID
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const nurseCollection = await getCollection("nurse");
+  if (!nurseCollection) return { errors: { form: "Error de servidor!" } };
+
+  const updateData = {
+    firstName: validatedFields.data.firstName,
+    lastName: validatedFields.data.lastName,
+    email: validatedFields.data.email,
+  };
+
+  // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
+  if (validatedFields.data.password) {
+    // Primero, buscar al admin para verificar su contraseña actual
+    const nurse = await nurseCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+    if (!nurse) {
+      return { errors: { form: "Enfermero/a no encontrado." } };
+    }
+
+    // Verificar que la contraseña actual es correcta
+    const isCurrentPasswordValid = await bcrypt.compare(
+      validatedFields.data.currentPassword,
+      nurse.password
+    );
+
+    if (!isCurrentPasswordValid) {
+      return {
+        errors: { currentPassword: "La contraseña actual no es correcta." },
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
+    updateData.password = hashedPassword;
+  }
+
+  try {
+    await nurseCollection.updateOne(
+      { _id: ObjectId.createFromHexString(id) },
+      { $set: updateData }
+    );
+  } catch (error) {
+    return { errors: { form: "No se pudo actualizar el enfermero/a." } };
+  }
+
+  revalidatePath("/admin/information/nurses/show-nurses");
+  redirect("/admin/information/nurses/show-nurses");
+}
+
+export async function editUser(state, formData) {
+  // **EXTRACT FORM FIELDS
+  const id = formData.get("id");
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
+  const currentPassword = formData.get("currentPassword");
+
+  // **VALIDATE FORM FIELDS
+  const validatedFields = EditFormSchema.safeParse({
+    firstName,
+    lastName,
+    email,
+    password: password || undefined, // Hacemos la contraseña opcional en la validación
+    confirmPassword: confirmPassword || undefined,
+    currentPassword: currentPassword || undefined,
+  });
+
+  // **IF ANY FORM FIELDS ARE INVALID
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const userCollection = await getCollection("users");
+  if (!userCollection) return { errors: { form: "Error de servidor!" } };
+
+  const updateData = {
+    firstName: validatedFields.data.firstName,
+    lastName: validatedFields.data.lastName,
+    email: validatedFields.data.email,
+  };
+
+  // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
+  if (validatedFields.data.password) {
+    // Primero, buscar al admin para verificar su contraseña actual
+    const user = await userCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+    if (!user) {
+      return { errors: { form: "Empleado/a no encontrado." } };
+    }
+
+    // Verificar que la contraseña actual es correcta
+    const isCurrentPasswordValid = await bcrypt.compare(
+      validatedFields.data.currentPassword,
+      user.password
+    );
+
+    if (!isCurrentPasswordValid) {
+      return {
+        errors: { currentPassword: "La contraseña actual no es correcta." },
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
+    updateData.password = hashedPassword;
+  }
+
+  try {
+    await userCollection.updateOne(
+      { _id: ObjectId.createFromHexString(id) },
+      { $set: updateData }
+    );
+  } catch (error) {
+    return { errors: { form: "No se pudo actualizar el empleado/a." } };
+  }
+
+  revalidatePath("/admin/information/users/show-users");
+  redirect("/admin/information/users/show-users");
 }
 
 export async function login(state, formData) {

@@ -1,11 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { editAdmin } from "../actions/auth";
+import { editNurse } from "../actions/auth";
 import Link from "next/link";
 
-export default function UpdateAdminComponent({ admin }) {
-  const [state, action, isPending] = useActionState(editAdmin, undefined);
+export default function UpdateNurseComponent({ nurse }) {
+  const [state, action, isPending] = useActionState(editNurse, undefined);
 
   return (
     <div id="layoutAuthentication_content">
@@ -16,11 +16,11 @@ export default function UpdateAdminComponent({ admin }) {
               <div className="card border-dark mt-2 mb-2">
                 <div className="card-header">
                   <i className="fas fa-user-edit fa-fw me-1"></i>
-                  Editar Administrador
+                  Editar Enfermero/a
                 </div>
                 <div className="card-body">
                   <form action={action}>
-                    <input type="hidden" name="id" defaultValue={admin._id} />
+                    <input type="hidden" name="id" defaultValue={nurse._id} />
                     <div className="row mb-3">
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
@@ -30,7 +30,7 @@ export default function UpdateAdminComponent({ admin }) {
                             type="text"
                             name="firstName"
                             placeholder="Enter your first name"
-                            defaultValue={admin.firstName}
+                            defaultValue={nurse.firstName}
                           />
                           <label htmlFor="inputFirstName">Nombre</label>
                           {state?.errors?.firstName && (
@@ -51,7 +51,7 @@ export default function UpdateAdminComponent({ admin }) {
                             type="text"
                             name="lastName"
                             placeholder="Enter your last name"
-                            defaultValue={admin.lastName}
+                            defaultValue={nurse.lastName}
                           />
                           <label htmlFor="inputLastName">Apellidos</label>
                           {state?.errors?.lastName && (
@@ -72,7 +72,7 @@ export default function UpdateAdminComponent({ admin }) {
                         type="email"
                         name="email"
                         placeholder="name@example.com"
-                        defaultValue={admin.email}
+                        defaultValue={nurse.email}
                       />
                       <label htmlFor="inputEmail">Correo Electrónico</label>
                       {state?.errors?.email && (

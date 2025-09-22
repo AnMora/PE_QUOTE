@@ -52,7 +52,7 @@ export default function NavLinkComponent({
             aria-labelledby="headingTwo"
             data-bs-parent="#sidenavAccordion"
           >
-            <nav className="sb-sidenav-menu-nested nav">
+            <nav className="sb-sidenav-menu-nested nav rounded">
               {/* Dropdown para Administradores */}
               <a
                 className="nav-link collapsed"
@@ -73,7 +73,7 @@ export default function NavLinkComponent({
                 aria-labelledby="headingOne"
                 data-bs-parent="#Information"
               >
-                <nav className="sb-sidenav-menu-nested nav">
+                <nav className="sb-sidenav-menu-nested nav rounded">
                   {renderLinks(data.pageInformationAdmins)}
                 </nav>
               </div>
@@ -97,7 +97,7 @@ export default function NavLinkComponent({
                 aria-labelledby="headingTwo"
                 data-bs-parent="#Information"
               >
-                <nav className="sb-sidenav-menu-nested nav">
+                <nav className="sb-sidenav-menu-nested nav rounded">
                   {renderLinks(data.pageInformationNurses)}
                 </nav>
               </div>
@@ -121,7 +121,7 @@ export default function NavLinkComponent({
                 aria-labelledby="headingThree"
                 data-bs-parent="#Information"
               >
-                <nav className="sb-sidenav-menu-nested nav">
+                <nav className="sb-sidenav-menu-nested nav rounded">
                   {renderLinks(data.pageInformationUsers)}
                 </nav>
               </div>
@@ -150,7 +150,7 @@ export default function NavLinkComponent({
             aria-labelledby="headingThree"
             data-bs-parent="#sidenavAccordion"
           >
-            <nav className="sb-sidenav-menu-nested nav">
+            <nav className="sb-sidenav-menu-nested nav rounded">
               {renderLinks(data.pageInputs)}
             </nav>
           </div>

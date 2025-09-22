@@ -37,6 +37,40 @@ export const RegisterFormSchema = z.object({
     }
   });
 
+export const EditFormSchema = z.object({
+    firstName: z
+      .string()
+      .min(3, { message: "El nombre de usuario es requerido" })
+      .max(12, { message: "El nombre no puede ser más de 12 caracteres" })
+      .trim(),
+    lastName: z
+      .string()
+      .min(3, { message: "El apellido de usuario es requerido" })
+      .max(12, { message: "El apellido no puede ser más de 12 caracteres" })
+      .trim(),
+    email: z
+      .string()
+      .email({ message: "Ingrese un formato de correo valido" })
+      .trim(),
+    currentPassword: z.string().optional(),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
+  })
+  .superRefine((data, context) => {
+    if (data.password && !data.confirmPassword) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: "Confirme la nueva contraseña", path: ["confirmPassword"] });
+    }
+    if (data.password && data.password !== data.confirmPassword) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: "Las nuevas contraseñas no coinciden", path: ["confirmPassword"] });
+    }
+    if (data.password && data.password.length < 5) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: "Debe tener al menos 5 caracteres", path: ["password"] });
+    }
+    if (data.password && !data.currentPassword) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: "La contraseña actual es requerida para cambiarla", path: ["currentPassword"] });
+    }
+  });
+
 export const LoginFormSchema = z.object({
   email: z
     .string()

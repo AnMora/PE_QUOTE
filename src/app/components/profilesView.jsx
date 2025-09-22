@@ -2,21 +2,22 @@
 
 import Link from "next/link";
 
-export default function ProfilesView({ profiles = [], profileType }) {
+export default function ProfilesView({ profiles, isAdmin, editPath }) {
   // TODO: Implementar la lógica para eliminar un perfil.
   // Esto probablemente implicará llamar a una Server Action o una API route.
-  const handleDelete = (profileId) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar este ${profileType}?`)) {
-      console.log(`Eliminar ${profileType} con ID:`, profileId);
-      // Aquí iría la lógica de eliminación
-    }
-  };
+
+  // const handleDelete = (profileId) => {
+  //   if (window.confirm(`¿Estás seguro de que quieres eliminar este ${profileType}?`)) {
+  //     console.log(`Eliminar ${profileType} con ID:`, profileId);
+  //     // Aquí iría la lógica de eliminación
+  //   }
+  // };
 
   return (
     <div className="card border-success mt-2 mb-4">
       <div className="card-header">
         <i className="fas fa-table me-1"></i>
-        Listado de {profileType === 'admin' ? 'Administradores' : 'Usuarios'}
+        Listado de {isAdmin ? 'Administradores' : 'Usuarios'}
       </div>
       <div className="card-body">
         <table className="table table-bordered table-hover">
@@ -35,7 +36,7 @@ export default function ProfilesView({ profiles = [], profileType }) {
                 <td className="text-white">{profile.email}</td>
                 <td><span className="badge bg-success">{profile.range}</span></td>
                 <td>
-                  <Link href={`/admin/information/admins/update/${profile._id}`} className="btn btn-primary me-2">
+                  <Link href={`${editPath}/${profile._id}`} className="btn btn-primary me-2">
                     {/* <i className="fas fa-edit me-1"></i>  */}
                     Modificar
                   </Link>
