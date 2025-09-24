@@ -516,6 +516,47 @@ export async function loginAdmin(state, formData) {
   }
 }
 
+export async function deleteProfile(formData) {
+  // ** GET THE DATA FROM THE FORM
+  const profileId = formData.get("profileId");
+  const profileType = formData.get("profileType"); // 'admin', 'nurse', or 'user'
+
+  if (!profileId || !profileType) {
+    // Handle case where data is missing
+    return;
+  }
+
+  let collectionName;
+  let redirectPath;
+
+  switch (profileType) {
+    case 'admin':
+      collectionName = 'admin';
+      redirectPath = '/admin/information/admins/show-admins';
+      break;
+    case 'nurse':
+      collectionName = 'nurse';
+      redirectPath = '/admin/information/nurses/show-nurses';
+      break;
+    case 'user':
+      collectionName = 'users';
+      redirectPath = '/admin/information/users/show-users';
+      break;
+    default:
+      // Invalid profile type, do nothing.
+      return;
+  }
+
+  const collection = await getCollection(collectionName);
+  await collection.deleteOne({
+    _id: ObjectId.createFromHexString(profileId),
+  });
+
+  // ** REVALIDATE AND REDIRECT
+  revalidatePath(redirectPath);
+  redirect(redirectPath);
+}
+
 export async function logout(params) {
   const cookieStore = await cookies();
   cookieStore.delete("session");

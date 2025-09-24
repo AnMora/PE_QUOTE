@@ -27,7 +27,7 @@ export default async function showAdmins(params) {
 
       <ProfilesView
         profiles={profiles}
-        isAdmin={true}
+        profileType="admin"
         editPath="/admin/information/admins/edit-admins"
       />
     </>
