@@ -2,7 +2,11 @@
 
 import bcrypt from "bcrypt";
 import { getCollection } from "@/lib/db";
-import { RegisterFormSchema, LoginFormSchema, EditFormSchema } from "@/lib/rules";
+import {
+  RegisterFormSchema,
+  LoginFormSchema,
+  EditFormSchema,
+} from "@/lib/rules";
 import { redirect } from "next/navigation";
 import { createSession } from "@/lib/sessions";
 import { cookies } from "next/headers";
@@ -51,7 +55,7 @@ export async function register(state, formData) {
     email,
     password: hashedPassword,
     range: "user",
-  }); 
+  });
 
   // **CREATE A SESSION
   // await createSession(results.insertedId.toString());
@@ -152,7 +156,7 @@ export async function registerAdmin(state, formData) {
     lastName,
     email,
     password: hashedPassword,
-    range: "admin",
+    range: "supervisor",
   });
 
   // **CREATE A SESSION
@@ -201,7 +205,9 @@ export async function editAdmin(state, formData) {
   // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
   if (validatedFields.data.password) {
     // Primero, buscar al admin para verificar su contraseña actual
-    const admin = await adminCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+    const admin = await adminCollection.findOne({
+      _id: ObjectId.createFromHexString(id),
+    });
     if (!admin) {
       return { errors: { form: "Administrador no encontrado." } };
     }
@@ -274,7 +280,9 @@ export async function editNurse(state, formData) {
   // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
   if (validatedFields.data.password) {
     // Primero, buscar al admin para verificar su contraseña actual
-    const nurse = await nurseCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+    const nurse = await nurseCollection.findOne({
+      _id: ObjectId.createFromHexString(id),
+    });
     if (!nurse) {
       return { errors: { form: "Enfermero/a no encontrado." } };
     }
@@ -347,7 +355,9 @@ export async function editUser(state, formData) {
   // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
   if (validatedFields.data.password) {
     // Primero, buscar al admin para verificar su contraseña actual
-    const user = await userCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+    const user = await userCollection.findOne({
+      _id: ObjectId.createFromHexString(id),
+    });
     if (!user) {
       return { errors: { form: "Empleado/a no encontrado." } };
     }
@@ -519,7 +529,7 @@ export async function loginAdmin(state, formData) {
 export async function deleteProfile(formData) {
   // ** GET THE DATA FROM THE FORM
   const profileId = formData.get("profileId");
-  const profileType = formData.get("profileType"); // 'admin', 'nurse', or 'user'
+  const profileType = formData.get("profileType"); // 'admin' || 'supervisor', 'nurse', or 'user'
 
   if (!profileId || !profileType) {
     // Handle case where data is missing
@@ -530,17 +540,17 @@ export async function deleteProfile(formData) {
   let redirectPath;
 
   switch (profileType) {
-    case 'admin':
-      collectionName = 'admin';
-      redirectPath = '/admin/information/admins/show-admins';
+    case "supervisor":
+      collectionName = "admin";
+      redirectPath = "/admin/information/admins/show-admins";
       break;
-    case 'nurse':
-      collectionName = 'nurse';
-      redirectPath = '/admin/information/nurses/show-nurses';
+    case "nurse":
+      collectionName = "nurse";
+      redirectPath = "/admin/information/nurses/show-nurses";
       break;
-    case 'user':
-      collectionName = 'users';
-      redirectPath = '/admin/information/users/show-users';
+    case "user":
+      collectionName = "users";
+      redirectPath = "/admin/information/users/show-users";
       break;
     default:
       // Invalid profile type, do nothing.

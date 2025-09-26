@@ -18,8 +18,8 @@ export default function UpdateAdminComponent({ admin }) {
                   <i className="fas fa-user-edit fa-fw me-1"></i>
                   Editar Administrador
                 </div>
-                <div className="card-body">
-                  <form action={action}>
+                <form action={action}>
+                  <div className="card-body">
                     <input type="hidden" name="id" defaultValue={admin._id} />
                     <div className="row mb-3">
                       <div className="col-md-6">
@@ -93,7 +93,9 @@ export default function UpdateAdminComponent({ admin }) {
                         name="currentPassword"
                         placeholder="Contraseña actual"
                       />
-                      <label htmlFor="inputCurrentPassword">Contraseña Actual (requerida si cambia la contraseña)</label>
+                      <label htmlFor="inputCurrentPassword">
+                        Contraseña Actual (requerida si cambia la contraseña)
+                      </label>
                       {state?.errors?.currentPassword && (
                         <small
                           id="currentPasswordHelp"
@@ -115,13 +117,17 @@ export default function UpdateAdminComponent({ admin }) {
                             name="password"
                             placeholder="Nueva contraseña (opcional)"
                           />
-                          <label htmlFor="inputPassword">Nueva Contraseña</label>
+                          <label htmlFor="inputPassword">
+                            Nueva Contraseña
+                          </label>
                           {state?.errors?.password && (
                             <small
                               id="emailHelp"
                               className="form-text text-warning"
                             >
-                              <p className="text-warning">La contraseña debe:</p>
+                              <p className="text-warning">
+                                La contraseña debe:
+                              </p>
                               <ul className="small text-warning">
                                 {state.errors.password.map((err) => (
                                   <li key={err}>{err}</li>
@@ -146,34 +152,28 @@ export default function UpdateAdminComponent({ admin }) {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 mb-0">
-                      <div className="d-grid">
-                        <button
-                          disabled={isPending}
-                          className="btn btn-primary btn-block"
+                  </div>
+                  <div className="card-footer d-flex align-items-center justify-content-end">
+                    <button
+                      disabled={isPending}
+                      className="btn btn-primary btn-block"
+                    >
+                      {isPending ? (
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
                         >
-                          {isPending ? (
-                            <div
-                              className="spinner-border spinner-border-sm"
-                              role="status"
-                            >
-                              <span className="visually-hidden">
-                                Loading...
-                              </span>
-                            </div>
-                          ) : (
-                            "Actualizar"
-                          )}
-                        </button>
-                        <Link href="/admin/information/admins/show-admins">
-                          <button className="btn btn-danger m-1">
-                            Volver
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      ) : (
+                        "Actualizar"
+                      )}
+                    </button>
+                    <Link href="/admin/information/admins/show-admins">
+                      <button className="btn btn-danger m-1">Volver</button>
+                    </Link>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
