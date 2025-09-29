@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const RegisterFormSchema = z.object({
+export const RegisterFormSchema = z
+  .object({
     firstName: z
       .string()
       .min(3, { message: "El nombre de usuario es requerido" })
@@ -21,8 +22,8 @@ export const RegisterFormSchema = z.object({
       .min(5, { message: "Debe tener al menos 5 caracteres de longitud" })
       .regex(/[a-zA-Z]/, { message: "Debe contener al menos una letra" })
       .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
-      .regex(/[a-zA-Z0-9]/, {
-        message: "Debe contener al menos un carácter especial",
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Debe contener al menos un carácter especial (ej. !@#$%)",
       })
       .trim(),
     confirmPassword: z.string().trim(),
@@ -37,7 +38,8 @@ export const RegisterFormSchema = z.object({
     }
   });
 
-export const EditFormSchema = z.object({
+export const EditFormSchema = z
+  .object({
     firstName: z
       .string()
       .min(3, { message: "El nombre de usuario es requerido" })
@@ -58,16 +60,32 @@ export const EditFormSchema = z.object({
   })
   .superRefine((data, context) => {
     if (data.password && !data.confirmPassword) {
-      context.addIssue({ code: z.ZodIssueCode.custom, message: "Confirme la nueva contraseña", path: ["confirmPassword"] });
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Confirme la nueva contraseña",
+        path: ["confirmPassword"],
+      });
     }
     if (data.password && data.password !== data.confirmPassword) {
-      context.addIssue({ code: z.ZodIssueCode.custom, message: "Las nuevas contraseñas no coinciden", path: ["confirmPassword"] });
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Las nuevas contraseñas no coinciden",
+        path: ["confirmPassword"],
+      });
     }
     if (data.password && data.password.length < 5) {
-      context.addIssue({ code: z.ZodIssueCode.custom, message: "Debe tener al menos 5 caracteres", path: ["password"] });
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Debe tener al menos 5 caracteres",
+        path: ["password"],
+      });
     }
     if (data.password && !data.currentPassword) {
-      context.addIssue({ code: z.ZodIssueCode.custom, message: "La contraseña actual es requerida para cambiarla", path: ["currentPassword"] });
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La contraseña actual es requerida para cambiarla",
+        path: ["currentPassword"],
+      });
     }
   });
 
@@ -77,6 +95,76 @@ export const LoginFormSchema = z.object({
     .email({ message: "Ingrese un formato de correo valido" })
     .trim(),
   password: z.string().min(1, { message: "Contraseña es requerida" }).trim(),
+});
+
+export const InputFormSchema = z.object({
+  numeroDelArticulo: z
+    .string()
+    .min(1, { message: "El numero del articulo es requerido" })
+    .max(40, {
+      message: "El numero del articulo no puede tener más de 40 caracteres",
+    })
+    .regex(/[a-zA-Z]/, { message: "Debe contener al menos una letra" })
+    .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe contener al menos un carácter especial",
+    })
+    .trim(),
+
+  descripcionDelArticulo: z
+    .string()
+    .min(1, { message: "La descripcion del articulo es requerida" })
+    .trim(),
+
+  Categoria: z
+    .string()
+    .min(1, { message: "La categoria es requerida" })
+    .trim(),
+  
+  Pac_Int_CCSS: z
+    .string()
+    .min(1, { message: "Costo Paciente Interno CCSS es requerida" })
+    .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe contener al menos un carácter especial",
+    })
+    .trim(),
+
+  pacExtCOL: z
+    .string()
+    .min(1, { message: "Costo paciente Externo COLONES es requerida" })
+    .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe contener al menos un carácter especial",
+    })
+    .trim(),
+
+  pacIntCOL: z
+    .string()
+    .min(1, { message: "Costo paciente Interno COLONES es requerida" })
+    .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe contener al menos un carácter especial",
+    })
+    .trim(),
+
+  pacExtDOL: z
+    .string()
+    .min(1, { message: "Costo paciente Externo DOLARES es requerida" })
+    .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe contener al menos un carácter especial",
+    })
+    .trim(),
+
+  pacIntDOL: z
+    .string()
+    .min(1, { message: "Costo paciente Interno DOLARES es requerida" })
+    .regex(/[0-9]/, { message: "Debe contener al menos un numero" })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe contener al menos un carácter especial",
+    })
+    .trim(),
 });
 
 export const SuggestionFormSchema = z.object({
@@ -96,18 +184,20 @@ export const QuoteViewPatientSchema = z.object({
   fullName: z
     .string()
     .min(7, { message: "El nombre completo es requerido" })
-    .max(20, { message: "El nombre completo no puede tener más de 20 caracteres" })
+    .max(20, {
+      message: "El nombre completo no puede tener más de 20 caracteres",
+    })
     .trim(),
 
   dateOfBirth: z
     .string()
     .min(8, { message: "La fecha de nacimiento es requerida" })
     .regex(/[0-9]/, { message: "Debe contener los numeros" })
-      .regex(/[a-zA-Z0-9]/, {
-        message: "Debe tener la separacion de carácter especial",
-      })
+    .regex(/[a-zA-Z0-9]/, {
+      message: "Debe tener la separacion de carácter especial",
+    })
     .trim(),
-    
+
   email: z
     .string()
     .email({ message: "Ingrese un formato de correo valido" })

@@ -166,35 +166,27 @@ export async function registerAdmin(state, formData) {
   redirect("/admin/information/admins/show-admins");
 }
 
-export async function editAdmin(state, formData) {
+async function genericEditProfile(formData, collectionName, userType, redirectPath) {
   // **EXTRACT FORM FIELDS
   const id = formData.get("id");
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirmPassword");
-  const currentPassword = formData.get("currentPassword");
 
   // **VALIDATE FORM FIELDS
   const validatedFields = EditFormSchema.safeParse({
-    firstName,
-    lastName,
-    email,
-    password: password || undefined, // Hacemos la contraseña opcional en la validación
-    confirmPassword: confirmPassword || undefined,
-    currentPassword: currentPassword || undefined,
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
+    email: formData.get("email"),
+    password: formData.get("password") || undefined,
+    confirmPassword: formData.get("confirmPassword") || undefined,
+    currentPassword: formData.get("currentPassword") || undefined,
   });
 
   // **IF ANY FORM FIELDS ARE INVALID
   if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
+    return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const adminCollection = await getCollection("admin");
-  if (!adminCollection) return { errors: { form: "Error de servidor!" } };
+  const collection = await getCollection(collectionName);
+  if (!collection) return { errors: { form: "Error de servidor!" } };
 
   const updateData = {
     firstName: validatedFields.data.firstName,
@@ -202,176 +194,22 @@ export async function editAdmin(state, formData) {
     email: validatedFields.data.email,
   };
 
-  // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
+  // **IF A NEW PASSWORD IS PROVIDED, HASH AND ADD IT
   if (validatedFields.data.password) {
-    // Primero, buscar al admin para verificar su contraseña actual
-    const admin = await adminCollection.findOne({
-      _id: ObjectId.createFromHexString(id),
-    });
-    if (!admin) {
-      return { errors: { form: "Administrador no encontrado." } };
-    }
-
-    // Verificar que la contraseña actual es correcta
-    const isCurrentPasswordValid = await bcrypt.compare(
-      validatedFields.data.currentPassword,
-      admin.password
-    );
-
-    if (!isCurrentPasswordValid) {
-      return {
-        errors: { currentPassword: "La contraseña actual no es correcta." },
-      };
-    }
-
-    const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
-    updateData.password = hashedPassword;
-  }
-
-  try {
-    await adminCollection.updateOne(
-      { _id: ObjectId.createFromHexString(id) },
-      { $set: updateData }
-    );
-  } catch (error) {
-    return { errors: { form: "No se pudo actualizar el administrador." } };
-  }
-
-  revalidatePath("/admin/information/admins/show-admins");
-  redirect("/admin/information/admins/show-admins");
-}
-
-export async function editNurse(state, formData) {
-  // **EXTRACT FORM FIELDS
-  const id = formData.get("id");
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirmPassword");
-  const currentPassword = formData.get("currentPassword");
-
-  // **VALIDATE FORM FIELDS
-  const validatedFields = EditFormSchema.safeParse({
-    firstName,
-    lastName,
-    email,
-    password: password || undefined, // Hacemos la contraseña opcional en la validación
-    confirmPassword: confirmPassword || undefined,
-    currentPassword: currentPassword || undefined,
-  });
-
-  // **IF ANY FORM FIELDS ARE INVALID
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
-
-  const nurseCollection = await getCollection("nurse");
-  if (!nurseCollection) return { errors: { form: "Error de servidor!" } };
-
-  const updateData = {
-    firstName: validatedFields.data.firstName,
-    lastName: validatedFields.data.lastName,
-    email: validatedFields.data.email,
-  };
-
-  // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
-  if (validatedFields.data.password) {
-    // Primero, buscar al admin para verificar su contraseña actual
-    const nurse = await nurseCollection.findOne({
-      _id: ObjectId.createFromHexString(id),
-    });
-    if (!nurse) {
-      return { errors: { form: "Enfermero/a no encontrado." } };
-    }
-
-    // Verificar que la contraseña actual es correcta
-    const isCurrentPasswordValid = await bcrypt.compare(
-      validatedFields.data.currentPassword,
-      nurse.password
-    );
-
-    if (!isCurrentPasswordValid) {
-      return {
-        errors: { currentPassword: "La contraseña actual no es correcta." },
-      };
-    }
-
-    const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
-    updateData.password = hashedPassword;
-  }
-
-  try {
-    await nurseCollection.updateOne(
-      { _id: ObjectId.createFromHexString(id) },
-      { $set: updateData }
-    );
-  } catch (error) {
-    return { errors: { form: "No se pudo actualizar el enfermero/a." } };
-  }
-
-  revalidatePath("/admin/information/nurses/show-nurses");
-  redirect("/admin/information/nurses/show-nurses");
-}
-
-export async function editUser(state, formData) {
-  // **EXTRACT FORM FIELDS
-  const id = formData.get("id");
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirmPassword");
-  const currentPassword = formData.get("currentPassword");
-
-  // **VALIDATE FORM FIELDS
-  const validatedFields = EditFormSchema.safeParse({
-    firstName,
-    lastName,
-    email,
-    password: password || undefined, // Hacemos la contraseña opcional en la validación
-    confirmPassword: confirmPassword || undefined,
-    currentPassword: currentPassword || undefined,
-  });
-
-  // **IF ANY FORM FIELDS ARE INVALID
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
-
-  const userCollection = await getCollection("users");
-  if (!userCollection) return { errors: { form: "Error de servidor!" } };
-
-  const updateData = {
-    firstName: validatedFields.data.firstName,
-    lastName: validatedFields.data.lastName,
-    email: validatedFields.data.email,
-  };
-
-  // **SI SE PROPORCIONA UNA NUEVA CONTRASEÑA, HASHEARLA Y AÑADIRLA
-  if (validatedFields.data.password) {
-    // Primero, buscar al admin para verificar su contraseña actual
-    const user = await userCollection.findOne({
+    const user = await collection.findOne({
       _id: ObjectId.createFromHexString(id),
     });
     if (!user) {
-      return { errors: { form: "Empleado/a no encontrado." } };
+      return { errors: { form: `${userType} no encontrado.` } };
     }
 
-    // Verificar que la contraseña actual es correcta
     const isCurrentPasswordValid = await bcrypt.compare(
       validatedFields.data.currentPassword,
       user.password
     );
 
     if (!isCurrentPasswordValid) {
-      return {
-        errors: { currentPassword: "La contraseña actual no es correcta." },
-      };
+      return { errors: { currentPassword: "La contraseña actual no es correcta." } };
     }
 
     const hashedPassword = await bcrypt.hash(validatedFields.data.password, 10);
@@ -379,36 +217,52 @@ export async function editUser(state, formData) {
   }
 
   try {
-    await userCollection.updateOne(
+    await collection.updateOne(
       { _id: ObjectId.createFromHexString(id) },
       { $set: updateData }
     );
   } catch (error) {
-    return { errors: { form: "No se pudo actualizar el empleado/a." } };
+    return { errors: { form: `No se pudo actualizar el ${userType}.` } };
   }
 
-  revalidatePath("/admin/information/users/show-users");
-  redirect("/admin/information/users/show-users");
+  revalidatePath(redirectPath);
+  redirect(redirectPath);
 }
 
-export async function login(state, formData) {
+export async function editAdmin(state, formData) {
+  return genericEditProfile(
+    formData,
+    "admin",
+    "Administrador",
+    "/admin/information/admins/show-admins"
+  );
+}
+
+export async function editNurse(state, formData) {
+  return genericEditProfile(formData, "nurse", "Enfermero/a", "/admin/information/nurses/show-nurses");
+}
+
+export async function editUser(state, formData) {
+  return genericEditProfile(formData, "users", "Empleado/a", "/admin/information/users/show-users");
+}
+
+async function genericLogin(formData, collectionName, redirectPathPrefix) {
   // ** CHECK THE INPUTS FORM FIELDS
   const validatedFields = LoginFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  // ** VALIDATE FORM FIELDS
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       email: formData.get("email"),
     };
   }
-
+  
   const { email, password } = validatedFields.data;
 
-  const userCollection = await getCollection("users");
+  const userCollection = await getCollection(collectionName);
   if (!userCollection) return { errors: { email: "Error de servidor!" } };
 
   try {
@@ -416,114 +270,28 @@ export async function login(state, formData) {
     if (!existingUser) {
       return { errors: { email: "Credenciales invalidos!" } };
     }
-    const matchedPassword = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
+    const matchedPassword = await bcrypt.compare(password, existingUser.password);
     if (!matchedPassword) {
       return { errors: { password: "Contraseña invalida!" } };
     }
     await createSession(existingUser._id.toString());
-    // console.log(existingUser);
-    return { redirectTo: `/dashboard/${existingUser._id.toString()}` };
+    return { redirectTo: `${redirectPathPrefix}/${existingUser._id.toString()}` };
   } catch (error) {
     console.error("Error durante el proceso de inicio de sesión: ", error);
-    return {
-      errors: {
-        email: "Se ha producido un error. Inténtelo de nuevo más tarde.",
-      },
-    };
+    return { errors: { email: "Se ha producido un error. Inténtelo de nuevo más tarde." } };
   }
+}
+
+export async function login(state, formData) {
+  return genericLogin(formData, "users", "/dashboard");
 }
 
 export async function loginNurse(state, formData) {
-  // ** CHECK THE INPUTS FORM FIELDS
-  const validatedFields = LoginFormSchema.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
-
-  // ** VALIDATE FORM FIELDS
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      email: formData.get("email"),
-    };
-  }
-
-  const { email, password } = validatedFields.data;
-
-  const userCollection = await getCollection("nurse");
-  if (!userCollection) return { errors: { email: "Error de servidor!" } };
-
-  try {
-    const existingNurse = await userCollection.findOne({ email });
-    if (!existingNurse) {
-      return { errors: { email: "Credenciales invalidos!" } };
-    }
-    const matchedPassword = await bcrypt.compare(
-      password,
-      existingNurse.password
-    );
-    if (!matchedPassword) {
-      return { errors: { password: "Contraseña invalida!" } };
-    }
-    await createSession(existingNurse._id.toString());
-    // console.log(existingNurse);
-    return { redirectTo: `/nurse/dashboard/${existingNurse._id.toString()}` };
-  } catch (error) {
-    console.error("Error durante el proceso de inicio de sesión: ", error);
-    return {
-      errors: {
-        email: "Se ha producido un error. Inténtelo de nuevo más tarde.",
-      },
-    };
-  }
+  return genericLogin(formData, "nurse", "/nurse/dashboard");
 }
 
 export async function loginAdmin(state, formData) {
-  // ** CHECK THE INPUTS FORM FIELDS
-  const validatedFields = LoginFormSchema.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
-
-  // ** VALIDATE FORM FIELDS
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      email: formData.get("email"),
-    };
-  }
-
-  const { email, password } = validatedFields.data;
-
-  const userCollection = await getCollection("admin");
-  if (!userCollection) return { errors: { email: "Error de servidor!" } };
-
-  try {
-    const existingAdmin = await userCollection.findOne({ email });
-    if (!existingAdmin) {
-      return { errors: { email: "Credenciales invalidos!" } };
-    }
-    const matchedPassword = await bcrypt.compare(
-      password,
-      existingAdmin.password
-    );
-    if (!matchedPassword) {
-      return { errors: { password: "Contraseña invalida!" } };
-    }
-    await createSession(existingAdmin._id.toString());
-    // console.log(existingAdmin);
-    return { redirectTo: `/admin/dashboard/${existingAdmin._id.toString()}` };
-  } catch (error) {
-    console.error("Error durante el proceso de inicio de sesión: ", error);
-    return {
-      errors: {
-        email: "Se ha producido un error. Inténtelo de nuevo más tarde.",
-      },
-    };
-  }
+  return genericLogin(formData, "admin", "/admin/dashboard");
 }
 
 export async function deleteProfile(formData) {

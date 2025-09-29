@@ -1,18 +1,23 @@
 "use client";
 
-import React, { useActionState } from "react";
-import { loginAdmin } from "../actions/auth";
+import React, { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function LoginAdminComponent(params) {
-  const [state, action, isPending] = useActionState(loginAdmin, undefined);
+export default function LoginComponent({
+  loginAction,
+  title,
+  borderColor,
+  footerConfig,
+}) {
+  const [state, action, isPending] = useActionState(loginAction, undefined);
   const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (state?.redirectTo) {
       router.push(state.redirectTo);
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <div id="layoutAuthentication_content">
@@ -20,10 +25,10 @@ export default function LoginAdminComponent(params) {
         <div className="container px-2">
           <div className="row justify-content-center">
             <div className="col-lg-5">
-              <div className="card border-dark mt-2 mb-2">
+              <div className={`card ${borderColor} mt-2 mb-2`}>
                 <div className="card-header">
                   <i className="fas fa-user fa-fw me-1"></i>
-                  Admin Hospital Metropolitano
+                  {title}
                 </div>
                 <div className="card-body">
                   <form action={action}>
@@ -57,19 +62,16 @@ export default function LoginAdminComponent(params) {
                       <label htmlFor="inputPassword">Contraseña</label>
                       {state?.errors?.password && (
                         <small
-                          id="emailHelp"
+                          id="passwordHelp"
                           className="form-text text-warning"
                         >
                           {state.errors.password}
                         </small>
                       )}
                     </div>
-                    <div className="mt-2">
+                    <div className="mt-2 mb-0">
                       <div className="d-grid">
-                        <button
-                          disabled={isPending}
-                          className="btn btn-primary"
-                        >
+                        <button disabled={isPending} className="btn btn-primary">
                           {isPending ? (
                             <div
                               className="spinner-border spinner-border-sm"
@@ -87,6 +89,18 @@ export default function LoginAdminComponent(params) {
                     </div>
                   </form>
                 </div>
+                {footerConfig && (
+                  <div className={`card-footer ${footerConfig.bgColor}`}>
+                    <div className="d-flex align-items-center justify-content-between">
+                      <p className="pt-2">{footerConfig.text}</p>
+                      <Link className="nav-link" href={footerConfig.href}>
+                        <button className={`btn ${footerConfig.buttonClass}`}>
+                          {footerConfig.buttonText}
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

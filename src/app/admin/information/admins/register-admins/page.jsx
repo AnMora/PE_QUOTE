@@ -3,7 +3,7 @@ import RegisterAdminComponent from "@/app/components/registerAdmin";
 export default function registerAdmin(params) {
     return (
         <>
-            <h1 className="mt-4">Listado de Administradores</h1>
+            <h1 className="mt-4">Registro de Administradores</h1>
             <ol className="breadcrumb">
                 <li className="breadcrumb-item active">
                     Para registrar un administrador por favor complete los siguientes datos:

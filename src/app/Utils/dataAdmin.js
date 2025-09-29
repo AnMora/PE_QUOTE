@@ -81,7 +81,7 @@ const CUPPanelAdmin = {
       icon: "fas fa-table text-success",
     },
     {
-      path: "/admin/inputs/update-inputs",
+      path: "/admin/inputs/show-inputs",
       session: "Actualizar",
       icon: "fas fa-table text-success",
     },

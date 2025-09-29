@@ -18,8 +18,8 @@ export default function RegisterComponent(params) {
                   <i className="fas fa-user fa-fw me-1"></i>
                   Crear empleado Hospital Metropolitano
                 </div>
-                <div className="card-body">
-                  <form action={action}>
+                <form action={action}>
+                  <div className="card-body">
                     <div className="row mb-3">
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
@@ -75,7 +75,10 @@ export default function RegisterComponent(params) {
                       />
                       <label htmlFor="inputEmail">Correo Electrónico</label>
                       {state?.errors?.email && (
-                        <small id="emailHelp" className="form-text text-warning">
+                        <small
+                          id="emailHelp"
+                          className="form-text text-warning"
+                        >
                           {state.errors.email}
                         </small>
                       )}
@@ -96,7 +99,9 @@ export default function RegisterComponent(params) {
                               id="emailHelp"
                               className="form-text text-warning"
                             >
-                              <p className="text-warning">La contraseña debe:</p>
+                              <p className="text-warning">
+                                La contraseña debe:
+                              </p>
                               <ul className="small text-warning">
                                 {state.errors.password.map((err) => (
                                   <li key={err}>{err}</li>
@@ -129,22 +134,25 @@ export default function RegisterComponent(params) {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 mb-0">
-                      <div className="d-grid">
-                        <button
-                          disabled={isPending}
-                          className="btn btn-primary btn-block"
+                  </div>
+                  <div className="card-footer d-flex align-items-center justify-content-end">
+                    <button
+                      disabled={isPending}
+                      className="btn btn-primary btn-block"
+                    >
+                      {isPending ? (
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
                         >
-                          {isPending ? (
-                            <div className="spinner-border spinner-border-sm" role="status">
-                              <span className="visually-hidden">Loading...</span>
-                            </div>
-                          ) : "Crear cuenta"}
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      ) : (
+                        "Crear cuenta"
+                      )}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

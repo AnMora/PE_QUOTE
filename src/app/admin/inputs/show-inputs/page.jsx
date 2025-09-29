@@ -1,4 +1,3 @@
-import ProfilesView from "@/app/components/profilesView";
 import { getCollection } from "@/lib/db";
 import getAuthUser from "@/lib/getAuthUser";
 
@@ -27,8 +26,6 @@ export default async function updateInputs(params) {
                 Informacion general: Actualizacion, modificacion y eliminacion de insumos
                 </li>
             </ol>
-
-            {/* <ProfilesView profiles={sanitizedInputProfiles} profileType="input" /> */}
             
             {/* SE VA A NECESITAR LLAMAR LA TABLA DE INSUMOS
                 1. Con limite y paginaciones

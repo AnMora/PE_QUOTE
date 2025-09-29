@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { registerAdmin } from "../actions/auth";
+import Link from "next/link";
 
 export default function RegisterAdminComponent(params) {
   const [state, action, isPending] = useActionState(registerAdmin, undefined);
@@ -12,13 +13,13 @@ export default function RegisterAdminComponent(params) {
         <div className="container px-2">
           <div className="row justify-content-center">
             <div className="col-lg-8">
-            <div className="card border-dark mt-2 mb-2">
+              <div className="card border-dark mt-2 mb-2">
                 <div className="card-header">
                   <i className="fas fa-user fa-fw me-1"></i>
                   Crear administrador Hospital Metropolitano
                 </div>
-                <div className="card-body">
-                  <form action={action}>
+                <form action={action}>
+                  <div className="card-body">
                     <div className="row mb-3">
                       <div className="col-md-6">
                         <div className="form-floating mb-3 mb-md-0">
@@ -74,7 +75,10 @@ export default function RegisterAdminComponent(params) {
                       />
                       <label htmlFor="inputEmail">Correo Electrónico</label>
                       {state?.errors?.email && (
-                        <small id="emailHelp" className="form-text text-warning">
+                        <small
+                          id="emailHelp"
+                          className="form-text text-warning"
+                        >
                           {state.errors.email}
                         </small>
                       )}
@@ -95,7 +99,9 @@ export default function RegisterAdminComponent(params) {
                               id="emailHelp"
                               className="form-text text-warning"
                             >
-                              <p className="text-warning">La contraseña debe:</p>
+                              <p className="text-warning">
+                                La contraseña debe:
+                              </p>
                               <ul className="small text-warning">
                                 {state.errors.password.map((err) => (
                                   <li key={err}>{err}</li>
@@ -115,7 +121,7 @@ export default function RegisterAdminComponent(params) {
                             placeholder="Confirm password"
                           />
                           <label htmlFor="inputPasswordConfirm">
-                          Confirmar Contraseña
+                            Confirmar Contraseña
                           </label>
                           {state?.errors?.confirmPassword && (
                             <small
@@ -128,22 +134,25 @@ export default function RegisterAdminComponent(params) {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 mb-0">
-                    <div className="d-grid">
-                        <button
-                          disabled={isPending}
-                          className="btn btn-primary btn-block"
+                  </div>
+                  <div className="card-footer d-flex align-items-center justify-content-end">
+                    <button
+                      disabled={isPending}
+                      className="btn btn-primary btn-block"
+                    >
+                      {isPending ? (
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
                         >
-                          {isPending ? (
-                            <div className="spinner-border spinner-border-sm" role="status">
-                              <span className="visually-hidden">Loading...</span>
-                            </div>
-                          ) : "Crear cuenta"}
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      ) : (
+                        "Crear cuenta"
+                      )}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
