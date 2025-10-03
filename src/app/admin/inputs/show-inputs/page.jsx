@@ -16,7 +16,7 @@ export default async function updateInputs(params) {
         _id: profile._id.toString(),
     }));
 
-    return(
+    return( 
         <>
             <h1 className="mt-4">
                 Listado de insumos

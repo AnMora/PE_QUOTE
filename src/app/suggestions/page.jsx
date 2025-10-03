@@ -44,7 +44,7 @@ export default async function suggestions(params) {
             {suggestion.map((item) => (
               <div key={item._id} className="col-lg-4 col-md-12 col-sm-12">
                 <div
-                  className="card border-info mt-2 mb-2"
+                  className="card border-success mt-2 mb-2"
                   style={{ Height: "400px", minHeight: "300px" }}
                 >
                   <div className="card-header">
